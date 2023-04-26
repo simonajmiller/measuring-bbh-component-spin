@@ -2,7 +2,7 @@
 
 This repository contains all the code to reproduce the results in *Gravitational wave signals carry information beyond effective spin parameters* [insert arxiv link]. None of the specific data used is pushed to the repo because the files are large but we give step by step instructions on how to recreate all data used below. The repo is set up with all the requisite folders / organization. Folders that our scripts write data to currently just contain `.gitkeep` files as placeholders. 
 
-## 1. Generate Mock Population Parameters 
+## 1. Generate Simulated Population Parameters 
 
 ### Organization
 
@@ -19,9 +19,8 @@ $ python generate_underlying_pops.py
 These underlying populations are plotted in Figure 1. 
 To then generate 50,0000 *found* injections for each population, i.e. those from the underlying distributions that pass a network signal-to-noise-ratio  (SNR) threshold of 10, run 
 ```
-$ python generate_population1.py
+$ python generate_pops.py
 ``` 
-and repeat with `generate_population2.py` and `generate_population3.py`. 
 Note that this will take hours to run since most randomly generated parameter combinations to not produce signals that pass the SNR cut.
 Finally, to generate the `.json` file with the sensitivity injections from a flat distribution, which is needed for the selection effects term in population inference (see section 3), run 
 ```
