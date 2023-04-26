@@ -23,7 +23,7 @@ $ python generate_pops.py
 ``` 
 Note that this will take hours to run since most randomly generated parameter combinations to not produce signals that pass the SNR cut.
 
-In `Data/InjectedPopulationParameters` there is a jupyter notebook to look at the underlying versus detected population parameters for each of the three populations.
+In `Data/InjectedPopulationParameters` there is a jupyter notebook (`view_populations.ipynb`) to look at the underlying versus detected population parameters for each of the three populations.
 
 Finally, to generate the `.json` file with the sensitivity injections from a flat distribution, which is needed for the selection effects term in population inference (see section 3), run 
 ```
