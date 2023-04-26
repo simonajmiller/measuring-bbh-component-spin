@@ -4,9 +4,11 @@ This repository contains all the code to reproduce the results in *Gravitational
 
 ## 1. Generate Mock Population Parameters 
 
-Organization:
+**Organization**:
 - Scripts: `Code/GeneratePopulations/`
 - Outputs saved: `Data/InjectedPopulationParameters`
+
+**Instructions to reproduce**:
 
 The first step to generating mock catalogs of gravitational-wave events is to generate the parameters for each BBH in each population.
 First, to generate `.json` files containing the underlying distributions for each of the three populations, run 
@@ -27,10 +29,12 @@ $ python generate_flat_pop_for_injDict.py
 
 ## 2. Perform Individual Event Inference 
 
-Organization:
+**Organization**:
 - Scripts: `Code/IndivdualInference/`
 - Inputs read from: `Data/InjectedPopulationParameters`
 - Outputs saved: `Data/IndividualInferenceOutput` and `Data/PopulationInferenceInput`
+
+**Instructions to reproduce**:
 
 Next, from the 50,000 events we generated from each population, we want to choose a much smaller subset of events that we will inject into LIGO data. These will be our "catalogs" analogous to the actual events LIGO has detected. In the `makeDagFiles.py` and `launchBilby.py` scripts, we select a subset of the 50,000 found events, inject them Gaussian noise realiziations using O3 actual noise PSDs from LIGO Livingston, LIGO Hanford, and Virgo, and use `bilby` to perform parameter estimation on the signals. 
 
@@ -49,12 +53,6 @@ $ condor_submit_dag bilby_population1_highSpinPrecessing.dag
 ``` 
 for population 1 (and `bilby_population2_mediumSpin.dag` and `bilby_population3_lowSpinAligned.dag` analogously for the others).
 
-Helpful condor commands to monitor your jobs: 
-* `condor_q` to see the overview of how many are running
-* `condor_q -nobatch -dag` for more detailed info about each job
-* `watch condor_q` to wtch the overview of the runs
-* If any jobs are held, use `condor_q -hold` to see the reason they're hold. Usually its a memory issue, in which case you can do `condor_qedit JOB# RequestMemory=XXXXXX` and then `condor_release JOB#`. 
-
 Individual event parameter estimation will take days to weeks to run. Once jobs have finished, turn the `bilby` outputs into the correct format to be read into to population inference by running 
 ```
 $ python make_sampleDicts.py
@@ -66,10 +64,12 @@ $ python make_injectionDict_flat.py
 
 ## 3. Perform Population Level Inference
 
-Organization:
+**Organization**:
 - Scripts: `Code/PopulationInference/`
 - Inputs read from: `Data/PopulationInferenceInput`
 - Outputs saved: `Data/PopulationInferenceOutput`
+
+**Instructions to reproduce**:
 
 The final step to reproduce our results is to run population inference using `emcee` on our mock population outputs from `bilby` to see if we can recover the original populations we injected. 
 To run the beta+doubleGaussian model (Section III of the paper), run 
