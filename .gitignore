@@ -1,0 +1,8 @@
+**.json
+**/__pycache__
+**.err
+**.out
+**.log
+**/.ipynb_checkpoints
+Data/IndividualInferenceOutput/**/*.pickle
+Data/IndividualInferenceOutput/**/*.png
