@@ -1,6 +1,6 @@
-# Repository for ~Gravitational wave signals carry information beyond effective spin parameters~ (Miller et. al. 2023)
+# `measuring-bbh-component-spin`: Repository for *Gravitational wave signals carry information beyond effective spin parameters* (Miller et. al. 2023)
 
-This repository contains all the code to reproduce the results in ~Gravitational wave signals carry information beyond effective spin parameters~ [insert arxiv link]. None of the specific data used is pushed to the repo because the files are large but we give step by step instructions on how to recreate all data used below. The repo is set up with all the requisite folders / organization. Folders that our scripts write data to currently just contain `.gitkeep` files as placeholders. 
+This repository contains all the code to reproduce the results in *Gravitational wave signals carry information beyond effective spin parameters* [insert arxiv link]. None of the specific data used is pushed to the repo because the files are large but we give step by step instructions on how to recreate all data used below. The repo is set up with all the requisite folders / organization. Folders that our scripts write data to currently just contain `.gitkeep` files as placeholders. 
 
 ## 1. Generate Mock Population Parameters 
 
