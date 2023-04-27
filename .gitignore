@@ -5,6 +5,7 @@
 **.log
 **/.ipynb_checkpoints
 **.dag*
+**.pdf
 Code/IndividualInference/*.txt
 Data/IndividualInferenceOutput/**/*.pickle*
 Data/IndividualInferenceOutput/**/*.png
