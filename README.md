@@ -59,7 +59,7 @@ for population 1, and `bilby_population2_mediumSpin.dag` and `bilby_population3_
 Individual event parameter estimation will take days to weeks to run. You can monitor the progress of results by using at the `inspect_results.ipynb` notebook in the `Data/IndividualInferenceOutput/inspect_results` folder.
 
 
-## 4. Prep for Population Level Inference
+## 3. Prep for Population Level Inference
 
 ### Organization
 - Scripts: `Code/IndivdualInference/`
@@ -68,7 +68,7 @@ Individual event parameter estimation will take days to weeks to run. You can mo
 
 ### Instructions
 
-Once jobs have finished, turn the `bilby` outputs into the correct format to be read into to population inference by running 
+Once all of the `bilby` jobs have finished, turn the `bilby` outputs into the correct format to be read into to population inference by running 
 ```
 $ python make_sampleDicts.py
 ```
