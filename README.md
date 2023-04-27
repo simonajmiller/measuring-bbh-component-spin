@@ -17,7 +17,7 @@ First, to generate `.json` files containing the underlying distributions for eac
 $ python generate_underlying_pops.py
 ``` 
 These underlying populations are plotted in Figure 1. 
-To then generate 50,0000 *found* injections for each population, i.e. those from the underlying distributions that pass a network signal-to-noise-ratio  (SNR) threshold of 10, run 
+To then generate 10,000 *found* injections for each population, i.e. those from the underlying distributions that pass a network signal-to-noise-ratio  (SNR) threshold of 10, run 
 ```
 $ python generate_pops.py
 ``` 
