@@ -1,0 +1,13 @@
+universe = vanilla
+executable = /home/simona.miller/measuring-bbh-component-spin/Code/IndividualInference/launchBilby.sh
+arguments = $(jobNumber) $(json) $(outdir)
+notification = error
+accounting_group = ligo.dev.o3.cbc.bayesianpopulations.parametric
+RequestMemory = 20000
+RequestDisk = 500000
+log = /home/simona.miller/measuring-bbh-component-spin/Code/IndividualInference/condor/logs/pop3/job_$(jobNumber).log
+output = /home/simona.miller/measuring-bbh-component-spin/Code/IndividualInference/condor/logs/pop3/job_$(jobNumber).out
+error = /home/simona.miller/measuring-bbh-component-spin/Code/IndividualInference/condor/logs/pop3/job_$(jobNumber).err
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+queue 1

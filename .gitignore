@@ -4,5 +4,7 @@
 **.out
 **.log
 **/.ipynb_checkpoints
+**.txt
+**.dag*
 Data/IndividualInferenceOutput/**/*.pickle
 Data/IndividualInferenceOutput/**/*.png
