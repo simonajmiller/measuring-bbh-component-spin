@@ -48,7 +48,7 @@ $ python makeDagFiles.py
 to make a text file containing 300 ID numbers of the randomly selected events for each population, and corresponding `.dag` file in the `condor` sub-folder. These files are used to submit all 300 jobs per population to run `bilby` with `HTCondor` on the LIGO computing cluster.
 Also, in the `condor` sub-folder are the necessary `.sub` files that submit the `launchBilby.py` script.
 
-*IMPORTANT NOTE* In line 12 of `makeDagFiles.py`, line 16 of `launchBilby.py`, and line 12 of `launchBilby.sh` you will need to change the repository root to be your own.
+*IMPORTANT NOTE* In line 12 of `makeDagFiles.py`, line 18 of `launchBilby.py`, line 12 of `launchBilby.sh`, and lines 2 8 9 & 10 of each `.sub` file in the `condor` folder you will need to change the repository root to be your own.
 
 Once you have this set up, you are ready to submit to condor. To do this, simply run 
 ```
@@ -56,7 +56,9 @@ $ condor_submit_dag bilby_population1_highSpinPrecessing.dag
 ``` 
 for population 1 (and `bilby_population2_mediumSpin.dag` and `bilby_population3_lowSpinAligned.dag` analogously for the others).
 
-Individual event parameter estimation will take days to weeks to run. Once jobs have finished, turn the `bilby` outputs into the correct format to be read into to population inference by running 
+Individual event parameter estimation will take days to weeks to run. 
+
+Once jobs have finished, turn the `bilby` outputs into the correct format to be read into to population inference by running 
 ```
 $ python make_sampleDicts.py
 ```
