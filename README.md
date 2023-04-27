@@ -9,7 +9,7 @@ This repository contains all the code to reproduce the results in *Gravitational
 - Scripts: `Code/GeneratePopulations/`
 - Outputs saved: `Data/InjectedPopulationParameters`
 
-### Instructions to reproduce
+### Instructions
 
 The first step to generating mock catalogs of gravitational-wave events is to generate the parameters for each BBH in each population.
 First, to generate `.json` files containing the underlying distributions for each of the three populations, run 
@@ -35,9 +35,9 @@ $ python generate_flat_pop_for_injDict.py
 ### Organization
 - Scripts: `Code/IndivdualInference/`
 - Inputs read from: `Data/InjectedPopulationParameters`
-- Outputs saved: `Data/IndividualInferenceOutput` and `Data/PopulationInferenceInput`
+- Outputs saved: `Data/IndividualInferenceOutput`
 
-### Instructions to reproduce
+### Instructions
 
 Next, from the 50,000 events we generated from each population, we want to choose a much smaller subset of events that we will inject into LIGO data. These will be our "catalogs" analogous to the actual events LIGO has detected. In the `makeDagFiles.py` and `launchBilby.py` scripts, we select a subset of the 50,000 found events, inject them Gaussian noise realiziations using O3 actual noise PSDs from LIGO Livingston, LIGO Hanford, and Virgo, and use `bilby` to perform parameter estimation on the signals. 
 
@@ -50,13 +50,23 @@ Also, in the `condor` sub-folder are the necessary `.sub` files that submit the 
 
 *IMPORTANT NOTE* In line 12 of `makeDagFiles.py`, line 18 of `launchBilby.py`, line 12 of `launchBilby.sh`, and lines 2 8 9 & 10 of each `.sub` file in the `condor` folder you will need to change the repository root to be your own.
 
-Once you have this set up, you are ready to submit to condor. To do this, simply run 
+Once you have this set up, you are ready to submit to condor. To do this, in the `condor` folder, simply run 
 ```
 $ condor_submit_dag bilby_population1_highSpinPrecessing.dag
 ``` 
-for population 1 (and `bilby_population2_mediumSpin.dag` and `bilby_population3_lowSpinAligned.dag` analogously for the others).
+for population 1, and `bilby_population2_mediumSpin.dag` and `bilby_population3_lowSpinAligned.dag` analogously for the others.
 
-Individual event parameter estimation will take days to weeks to run. 
+Individual event parameter estimation will take days to weeks to run. You can monitor the progress of results by using at the `inspect_results.ipynb` notebook in the `Data/IndividualInferenceOutput/inspect_results` folder.
+
+
+## 4. Prep for Population Level Inference
+
+### Organization
+- Scripts: `Code/IndivdualInference/`
+- Inputs read from: `Data/IndividualInferenceOutput`
+- Outputs saved: `Data/PopulationInferenceInput`
+
+### Instructions
 
 Once jobs have finished, turn the `bilby` outputs into the correct format to be read into to population inference by running 
 ```
@@ -67,14 +77,14 @@ Finally, to format the sensitivity injections correctly, run
 $ python make_injectionDict_flat.py
 ```
 
-## 3. Perform Population Level Inference
+## 4. Perform Population Level Inference
 
 ### Organization
 - Scripts: `Code/PopulationInference/`
 - Inputs read from: `Data/PopulationInferenceInput`
 - Outputs saved: `Data/PopulationInferenceOutput`
 
-### Instructions to reproduce
+### Instructions
 
 The final step to reproduce our results is to run population inference using `emcee` on our mock population outputs from `bilby` to see if we can recover the original populations we injected. 
 To run the beta+doubleGaussian model (Section III of the paper), run 
