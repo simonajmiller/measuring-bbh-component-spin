@@ -12,8 +12,8 @@ import pandas as pd
 from helper_functions import *
 
 
-# Want to generate 50000 draws from the population
-target = 50000 
+# Want to generate 10000 draws from the population
+target = 10000 
 
 # for mass distribution
 lambda_peak=0.033
