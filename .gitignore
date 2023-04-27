@@ -6,5 +6,6 @@
 **/.ipynb_checkpoints
 **.dag*
 Code/IndividualInference/*.txt
-Data/IndividualInferenceOutput/**/*.pickle
+Data/IndividualInferenceOutput/**/*.pickle*
 Data/IndividualInferenceOutput/**/*.png
+Data/IndividualInferenceOutput/**/*.txt
