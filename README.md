@@ -97,4 +97,6 @@ This is repeated for `run_beta_plus_gaussian.py` to produce the results for Sect
 
 To look at the `emcee` outputs, use notebooks `inspect_betaPlusDoubleGaussian.ipynb` and `inspect_betaGaussian.ipynb` in the `Data/PopulationInferenceOutput` folder. 
 
-Code to generate all figures is found in the `Figures` folder, which largely takes data from the `Data/PopulationInferenceOutput` as inputs.
+## 5. Generate Figures
+
+Code to generate all figures in our paper is found in the `Figures` folder, which largely takes data from the `Data/PopulationInferenceOutput` as inputs.
