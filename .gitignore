@@ -10,3 +10,4 @@ Code/IndividualInference/*.txt
 Data/IndividualInferenceOutput/**/*.pickle*
 Data/IndividualInferenceOutput/**/*.png
 Data/IndividualInferenceOutput/**/*.txt
+Code/IndividualInference/condor/.distance_marginalization_lookup.npz
