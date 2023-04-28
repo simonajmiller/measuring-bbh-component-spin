@@ -1,7 +1,7 @@
 import numpy as np
 import sys 
 
-sys.path.append('./../Code/PopulationInference')
+sys.path.append('/home/simona.miller/measuring-bbh-component-spin/Code/PopulationInference')
 from posterior_helper_functions import *
 
 def calculate_chiEff(chi1, chi2, cost1, cost2, q): 
