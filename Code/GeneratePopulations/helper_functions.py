@@ -287,3 +287,22 @@ def mu_sigma2_to_a_b(mu, sigma2):
     b = mu*((1-mu)**2.)/sigma2 + mu - 1
     
     return a,b
+
+
+
+def p_astro_m1(m1, alpha=-3.51, mMin=5.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
+    
+    # power law for m1:
+    p_m1_pl = (1.+alpha)*m1**alpha/(mMax**(1.+alpha) - mMin**(1.+alpha))
+    p_m1_pl[m1>mMax] = 0.
+    
+    # gaussian peak
+    p_m1_peak = np.exp(-0.5*(m1-m0)**2./sigM**2)/np.sqrt(2.*np.pi*sigM**2.)
+    p_m1 = lambda_peak*p_m1_peak + (1.-lambda_peak)*p_m1_pl
+    
+    # smoothing fxn 
+    p_m1[m1<mMin+deltaM] = p_m1[m1<mMin+deltaM]*smoothing_fxn(m1[m1<mMin+deltaM]-mMin,deltaM)
+    
+    p_m1[m1<mMin] = 0.
+    
+    return p_m1
