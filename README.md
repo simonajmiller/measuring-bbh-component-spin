@@ -43,9 +43,9 @@ Next, from the 50,000 events we generated from each population, we want to choos
 
 Run
 ```
-$ python makeDagFiles.py
+$ python makeDagFiles.py nEvents
 ```
-to make a text file containing 300 ID numbers of the randomly selected events for each population, and corresponding `.dag` file in the `condor` sub-folder. These files are used to submit all 300 jobs per population to run `bilby` with `HTCondor` on the LIGO computing cluster.
+to make a text file containing `nEvents` ID numbers of the randomly selected events for each population, and corresponding `.dag` file in the `condor` sub-folder. In our work we use `nEvents=300`. These files are used to submit all `nEvents` jobs per population to run `bilby` with `HTCondor` on the LIGO computing cluster.
 Also, in the `condor` sub-folder are the necessary `.sub` files that submit the `launchBilby.py` script.
 
 *IMPORTANT NOTE* In line 12 of `makeDagFiles.py`, line 18 of `launchBilby.py`, line 12 of `launchBilby.sh`, and lines 2 8 9 & 10 of each `.sub` file in the `condor` folder you will need to change the repository root to be your own.
