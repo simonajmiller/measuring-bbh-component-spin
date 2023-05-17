@@ -115,7 +115,7 @@ for pop in pop_names:
             print(f"event {int(event)} not found")
             
     # Save sampleDict in folder where population inference input goes 
-    with open(f'../../Data/PopulationInferenceInput/sampleDict_{pop}_temp.json', 'w') as f:
+    with open(f'../../Data/PopulationInferenceInput/sampleDict_{pop}_highmass_temp.json', 'w') as f:
         json.dump(sampleDict, f)
     
         
