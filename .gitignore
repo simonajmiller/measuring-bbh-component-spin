@@ -7,7 +7,14 @@
 **.dag*
 **.pdf
 Code/IndividualInference/*.txt
+Code/PopulationInference/condor/
 Data/IndividualInferenceOutput/**/*.pickle*
 Data/IndividualInferenceOutput/**/*.png
 Data/IndividualInferenceOutput/**/*.txt
 Code/IndividualInference/condor/.distance_marginalization_lookup.npz
+Data/PopulationInferenceOutput/.tmp/
+Code/PopulationInference/run_beta_plus_doublegaussian_justSpins.py
+Data/PopulationInferenceOutput/inspect_betaPlusDoubleGaussianJustSpin.ipynb
+Code/IndividualInference/makeDagfiles_relaunches_manual.py
+Code/PopulationInference/calculate_true_nsamp.py
+Code/PopulationInference/make_sampleDicts_highSNRonly.py
