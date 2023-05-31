@@ -40,7 +40,7 @@ target = 10000
 lambda_peak=0.033
 
 # minimum mass for injections: 
-M_MIN = 20
+M_MIN = 5
 
 # Prepare interpolation grid for redshifts 
 z_grid = np.linspace(0.,2.,1000)
@@ -269,4 +269,4 @@ for fname in fnames:
             }
 
     df = pd.DataFrame(populationDict)
-    df.to_json(f'../../Data/InjectedPopulationParameters/{fname}.json')
+    df.to_json(f'../../Data/InjectedPopulationParameters/{fname}_fullmassrange.json')

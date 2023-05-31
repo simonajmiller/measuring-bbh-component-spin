@@ -40,7 +40,7 @@ target = 50000
 lambda_peak=0.033
 
 # minimum mass for injections: 
-M_MIN = 20
+M_MIN = 5
 
 # Arrays to hold injection values
 saved_m1s = np.zeros(target)
@@ -241,4 +241,4 @@ populationDict = {\
         }
 
 df = pd.DataFrame(populationDict)
-df.to_json('../../Data/InjectedPopulationParameters/flat_pop_for_injection_dict.json')
+df.to_json('../../Data/InjectedPopulationParameters/flat_pop_full_mass_range_for_injection_dict.json')

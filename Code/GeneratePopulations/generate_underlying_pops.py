@@ -19,7 +19,7 @@ target = 10000
 lambda_peak=0.033
 
 # minimum mass for injections: 
-M_MIN = 20
+M_MIN = 5
 
 fnames = ['underlying_population1_highSpinPrecessing', 'underlying_population2_mediumSpin', 'underlying_population3_lowSpinAligned']
 
@@ -154,4 +154,4 @@ for fname in fnames:
             }
 
     df = pd.DataFrame(populationDict)
-    df.to_json(f'../../Data/InjectedPopulationParameters/{fname}.json')
+    df.to_json(f'../../Data/InjectedPopulationParameters/{fname}_fullmassrange.json')

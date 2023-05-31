@@ -50,6 +50,7 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
     * `data`: Dict of datasets of posterior sample values + plotting color in hex code
     * `plot_bounds`: Tuple of min/max values to display on plot
     * `label`: A latex string for axis labeling
+    * `true_val`: Optional, true value of underlying population parameter
 
     Parameters
     ----------
@@ -99,7 +100,10 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
 
             ax.hist(posterior,bins=np.linspace(plot_data[key]['plot_bounds'][0],plot_data[key]['plot_bounds'][1],bins),\
                     histtype='step',color='black',density=True,zorder=2)
-        
+            
+        if 'true_val' in plot_data[key].keys(): 
+            ax.axvline(plot_data[key]['true_val'], ls='--', color='crimson')
+
         ax.grid(True,dashes=(1,3))
         ax.set_xlim(plot_data[key]['plot_bounds'][0],plot_data[key]['plot_bounds'][1])
         
@@ -136,6 +140,11 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
                     ax.hexbin(posterior1,posterior2,cmap=cmap,mincnt=1,gridsize=bins,bins=hexscale,\
                              rasterized=True,extent=(plot_data[key]['plot_bounds'][0],plot_data[key]['plot_bounds'][1],plot_data[k]['plot_bounds'][0],plot_data[k]['plot_bounds'][1]),
                              linewidths=(0,),zorder=0,vmax=vmax)
+                    
+                if 'true_val' in plot_data[key].keys(): 
+                    ax.axvline(plot_data[key]['true_val'], ls='--', color='crimson')
+                if 'true_val' in plot_data[k].keys(): 
+                    ax.axhline(plot_data[k]['true_val'], ls='--', color='crimson')
                 
                 # Set plot bounds
                 ax.set_xlim(plot_data[key]['plot_bounds'][0],plot_data[key]['plot_bounds'][1])
