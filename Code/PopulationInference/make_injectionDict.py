@@ -44,7 +44,7 @@ Calculate injectionDict for each event
 '''
 
 # Load in detected population from flat injection
-detected_pop = pd.read_json(f'../../Data/InjectedPopulationParameters/flat_pop_for_injection_dict.json')
+detected_pop = pd.read_json(f'../../Data/InjectedPopulationParameters/flat_pop_full_mass_range_for_injection_dict.json')
 
 # Detected values for paramters of interest (spins, masses, redshift, dVdz) 
 chi1_det = np.sqrt(detected_pop['s1x'].values**2 + detected_pop['s1y'].values**2 + detected_pop['s1z'].values**2)
@@ -88,7 +88,7 @@ injectionDict = {
     'p_draw_a1a2cost1cost2':p_draw_spins[good_idxs].tolist(),
     'p_draw_m1m2z':p_draw_masses_redshift[good_idxs].tolist()
 }
-pwd
+
 # Save injectionDict in folder where population inference input goes 
-with open(f'../../Data/PopulationInferenceInput/injectionDict.json', 'w') as f:
+with open(f'../../Data/PopulationInferenceInput/injectionDict_full_mass_range.json', 'w') as f:
     json.dump(injectionDict, f)
