@@ -6,6 +6,9 @@
 **/.ipynb_checkpoints
 **.dag*
 **.pdf
+**/old
+**/old_highmass
+**/debugging
 Code/IndividualInference/*.txt
 Code/PopulationInference/condor/
 Data/IndividualInferenceOutput/**/*.pickle*

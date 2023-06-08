@@ -28,7 +28,7 @@ def draw_uniform(low, high, num=1):
     else: 
         return draws
 
-def inv_cdf_m1_PL(c, alpha=-3.51, mMin=5.00, mMax=88.21): 
+def inv_cdf_m1_PL(c, alpha=-3.51, mMin=6.00, mMax=88.21): 
     """
     Function to calculate the inverse cdf for the power law part of the power law +
     peak mass model from gwtc-3
@@ -52,7 +52,7 @@ def inv_cdf_m1_PL(c, alpha=-3.51, mMin=5.00, mMax=88.21):
     return np.power(tmp, 1/(1+alpha))
 
 
-def inv_cdf_m1_gaussian(c, m0=33.61, sigM=4.72, mMin=5.00, mMax=88.21): 
+def inv_cdf_m1_gaussian(c, m0=33.61, sigM=4.72, mMin=6.00, mMax=88.21): 
     """
     Function to calculate the inverse cdf for the gaussian peak part of the power law +
     peak mass model from gwtc-3
@@ -80,7 +80,7 @@ def inv_cdf_m1_gaussian(c, m0=33.61, sigM=4.72, mMin=5.00, mMax=88.21):
     return m0 + np.sqrt(2)*sigM*tmp
 
 
-def inv_cdf_m2(c, m1, bq=0.96, mMin=5.00): 
+def inv_cdf_m2(c, m1, bq=0.96, mMin=6.00): 
     """
     Function to calculate the inverse cdf for secondary mass under a power
     law
@@ -203,7 +203,7 @@ def smoothing_fxn(m, deltaM):
     
     return S
 
-def p_astro_masses(m1, m2, alpha=-3.51, bq=0.96, mMin=5.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
+def p_astro_masses(m1, m2, alpha=-3.51, bq=0.96, mMin=6.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
     
     """
     Function to calculate for p_astro(m1,m2) for the power law + peak mass model. 
@@ -290,7 +290,7 @@ def mu_sigma2_to_a_b(mu, sigma2):
 
 
 
-def p_astro_m1(m1, alpha=-3.51, mMin=5.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
+def p_astro_m1(m1, alpha=-3.51, mMin=6.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
     
     # power law for m1:
     p_m1_pl = (1.+alpha)*m1**alpha/(mMax**(1.+alpha) - mMin**(1.+alpha))

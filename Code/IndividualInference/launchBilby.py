@@ -30,7 +30,7 @@ injection = injections.loc[args.job]
 np.random.seed(int(injection.seed))
 
 # Reference frequency and phase
-fRef = 50.
+fRef = 20.
 phiRef = injection.phase
 
 # Source frame -> detector frame masses
@@ -52,8 +52,7 @@ t_geocenter = 1126259642.413 # hardcode geocenter time
 gmst = GreenwichMeanSiderealTime(t_geocenter)
 zenith_inj, azimuth_inj = bilby.core.utils.conversion.ra_dec_to_theta_phi(injection.ra, injection.dec, gmst)
 
-# Make dictionary of BBH parameters that includes all of the different waveform
-# parameters, including masses and spins of both black holes
+# Make dictionary of BBH parameters that includes all of the different waveform parameters, including masses and spins of both black holes
 injection_parameters = dict(
     mass_1=m1_det_inj,\
     mass_2=m2_det_inj,\
@@ -76,35 +75,33 @@ injection_parameters = dict(
 
 print(injection_parameters)
 
-# Sampling frequency and mininmum frequency of the data segment that we're going to 
-# inject the signal into
+# Sampling frequency and mininmum frequency of the data segment that we're going to inject the signal into
 sampling_frequency = 2048.
 fMin = 15.
+
+# There is a downsampling and filters applied so the data aren't actually free of aliasing/corruption to the nyquist limit
+fMax = sampling_frequency/2 * 0.9 
 
 # Fixed arguments passed into the source model
 waveform_arguments = dict(
     waveform_approximant='IMRPhenomXPHM',\
     reference_frequency=fRef,\
-    minimum_frequency=fMin
+    minimum_frequency=fMin, \
+    maximum_frequency=fMax
 )
 
-# Set up interferometers.  In this case we'll use two interferometers
-# (LIGO-Hanford (H1), LIGO-Livingston (L1). These default to their design
-# sensitivity
+# Set up interferometers.  In this case we'll use two interferometers (LIGO-Hanford (H1), LIGO-Livingston (L1). These default to
+# their design sensitivity
 ifos = bilby.gw.detector.InterferometerList(['H1', 'L1', 'V1'])
 ifos[0].power_spectral_density = bilby.gw.detector.PowerSpectralDensity(asd_file=directory+"Code/GeneratePopulations/aligo_O3actual_H1.txt")
 ifos[1].power_spectral_density = bilby.gw.detector.PowerSpectralDensity(asd_file=directory+"Code/GeneratePopulations/aligo_O3actual_L1.txt")
 ifos[2].power_spectral_density = bilby.gw.detector.PowerSpectralDensity(asd_file=directory+"Code/GeneratePopulations/avirgo_O3actual.txt")
 
-# Create the waveform_generator using a LAL BinaryBlackHole source function
-# the generator will convert all the parameters and inject the signal into the
-# ifos. 
-# For a small fraction of the signals, the given duration will be too small so we
-# increase as need be, in increments of half a second.
-duration = 8
-durationFlag=False
-while durationFlag==False:
-    try:
+# Create the waveform_generator using a LAL BinaryBlackHole source function the generator will convert all the parameters and inject the signal into the
+# into the ifos. Need to inject the signal into the smallest possible time window: 4 seconds, 8 seconds, or 16 seconds. 
+for duration in [4,8,16]: 
+    
+    try: 
         waveform_generator = bilby.gw.WaveformGenerator(
             duration=duration, 
             sampling_frequency=sampling_frequency,
@@ -119,18 +116,21 @@ while durationFlag==False:
         )
         ifos.inject_signal(waveform_generator=waveform_generator, parameters=injection_parameters)
         
-        durationFlag=True
-    except:
-        duration = duration + 0.5
+        # if this duration works, exit out of the for loop
+        duration_used = duration
+        break
+    
+    except Exception as e: 
+        print(e) 
           
-print('duration:',duration)
+print('duration:',duration_used)
+
+sys.exit()
         
-# For this analysis, we implement the standard precessing BBH priors defined in the prior.prior
-# file except for the definition of the time prior, which is defined as uniform about the
-# injected value, and we add additional constraints to the mass prior.
+# For this analysis, we implement most of the standard precessing BBH priors defined in the prior.prior file ...
+priors = bilby.gw.prior.BBHPriorDict(directory+"Code/IndividualInference/prior.prior")
 
-priors =  bilby.gw.prior.BBHPriorDict(directory+"Code/IndividualInference/prior.prior")
-
+# ... except for the definition of the time prior, which is defined as uniform about the injected value ...
 priors['geocent_time'] = bilby.core.prior.Uniform(
     minimum=injection_parameters['geocent_time'] - 0.1,                                             
     maximum=injection_parameters['geocent_time'] + 0.1,                                                  
@@ -139,21 +139,13 @@ priors['geocent_time'] = bilby.core.prior.Uniform(
     unit='$s$'
 )
 
-# Constrain component masses to be +/- 10 solar masses about the injected values, 
-# such that we don't run into convergence issues with bilby. 
-
-mMin=5.00*(1.+injection.z)
-mMax=88.21*(1.+injection.z)
-priors['mass_1'] = Constraint( # detector frame masses           
-    name='mass_1',                   
-    minimum=max(mMin, injection_parameters['mass_1']-10),                               
-    maximum=min(mMax, injection_parameters['mass_1']+10)
-)
-priors['mass_2'] = Constraint(
-    name='mass_2',                               
-    minimum=max(mMin, injection_parameters['mass_2']-10),                               
-    maximum=min(mMax, injection_parameters['mass_2']+10)
-)
+# ... and we constrain chirp mass to be +/- 10 solar masses about the injected value.
+inj_m1 = injection_parameters['mass_1']
+inj_m2 = injection_parameters['mass_2']
+inj_chirpmass = np.power(inj_m1*inj_m2, 3./5)/np.power(inj_m1+inj_m2, 1./5)
+minChirpMass = max(2, inj_chirpmass-10)
+maxChirpMass = min(200, inj_chirpmass+10)
+chirp_mass = bilby.gw.prior.UniformInComponentsChirpMass(name='chirp_mass', minimum=minChirpMass, maximum=maxChirpMass)               
 
 
 # Initialize the likelihood by passing in the interferometer data (ifos) and
@@ -163,27 +155,40 @@ priors['mass_2'] = Constraint(
 #    * time marginalization turned on, but sample in azimuth and zenith instead of
 #      ra and dec; this is done by setting reference_frame='H1L1'
 #    * distance marginalization turned on (this is always safe)
-likelihood = bilby.gw.GravitationalWaveTransient(
+likelihood_kwargs = dict(
     interferometers=ifos, 
-    waveform_generator=waveform_generator, 
-    priors=priors, 
-    reference_frame="H1L1",
-    distance_marginalization=True, 
-    phase_marginalization=False, 
-    time_marginalization=True
+        waveform_generator=waveform_generator, 
+        priors=priors, 
+        reference_frame="H1L1",
+        distance_marginalization=True, 
+        phase_marginalization=False, 
+        time_marginalization=True
 )
+# The likelihood we use depends on the duration of the signal 
+# (see https://git.ligo.org/pe/O4/o4a-rota/-/wikis/Samplers) 
+if duration_used==4 or duration_used==8:
+    likelihood = bilby.gw.GravitationalWaveTransient(**likelihood_kwargs)
+else: 
+    likelihood = bilby.gw.MBGravitationalWaveTransient(**likelihood_kwargs)
 
-# Run sampler. In this case we're going to use the `cpnest` sampler
-# Note that the maxmcmc parameter is increased so that between each iteration of
-# the nested sampler approach, the walkers will move further using an mcmc
-# approach, searching the full parameter space.
+# Set up properties for sampler
+sampler_kwargs = dict(
+    sampler='dynesty',
+    nlive=1000, 
+    naccept=60, 
+    sample="acceptance-walk", 
+    npool=8, 
+    request_cpus=8, 
+    nparallel=2
+)
+if duration_used==16: 
+    sample_kwargs['min_ncall'] = 1000000
+
+# Run sampler
 result = bilby.run_sampler(
+    **sampler_kwargs,
     likelihood=likelihood, 
     priors=priors, 
-    sampler='dynesty', 
-    nlive=2000,
-    nact=5,
-    npool=8,
     injection_parameters=injection_parameters, 
     outdir=args.outdir,
     label=label,

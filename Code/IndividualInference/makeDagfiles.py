@@ -1,7 +1,5 @@
 import numpy as np
 import json
-import matplotlib.pyplot as plt
-from scipy.special import erf
 import sys
 import pandas as pd
 
@@ -32,4 +30,4 @@ for j,pop_name in enumerate(pop_names):
     with open(dagfile,'w') as df: 
         for i in to_inject:
             df.write('JOB {0} {1}Code/IndividualInference/condor/bilby_{2}.sub\n'.format(int(i),root,pop_name))
-            df.write('VARS {0} jobNumber="{0}" json="{1}Data/InjectedPopulationParameters/{2}.json" outdir="{1}Data/IndividualInferenceOutput/{2}"\n\n'.format(int(i),root,pop_name))
+            df.write('VARS {0} jobNumber="{0}" json="{1}Data/InjectedPopulationParameters/{2}_fullmassrange.json" outdir="{1}Data/IndividualInferenceOutput/{2}"\n\n'.format(int(i),root,pop_name))

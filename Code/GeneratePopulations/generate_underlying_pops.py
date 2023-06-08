@@ -18,9 +18,6 @@ target = 10000
 # for mass distribution
 lambda_peak=0.033
 
-# minimum mass for injections: 
-M_MIN = 5
-
 fnames = ['underlying_population1_highSpinPrecessing', 'underlying_population2_mediumSpin', 'underlying_population3_lowSpinAligned']
 
 for fname in fnames:
@@ -56,13 +53,13 @@ for fname in fnames:
         # Random primary mass
         c_m1 = np.random.random()
         if np.random.rand() > lambda_peak: # in power law part of distribution 
-            m1 = inv_cdf_m1_PL(c_m1, mMin=M_MIN)
+            m1 = inv_cdf_m1_PL(c_m1)
         else: # in gaussian peak part of distribution
-            m1 = inv_cdf_m1_gaussian(c_m1, mMin=M_MIN)
+            m1 = inv_cdf_m1_gaussian(c_m1)
 
         # Random m2
         c_m2 = np.random.random()
-        m2 = inv_cdf_m2(c_m2, m1, mMin=M_MIN)
+        m2 = inv_cdf_m2(c_m2, m1)
 
         # Random redshift
         cz = np.random.random()

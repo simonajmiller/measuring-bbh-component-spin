@@ -229,7 +229,7 @@ def smoothing_fxn(m, deltaM):
     
     return S
 
-def p_astro_masses(m1, m2, alpha=-3.51, bq=0.96, mMin=5.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
+def p_astro_masses(m1, m2, alpha=-3.51, bq=0.96, mMin=6.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
     
     """
     Function to calculate for p_astro(m1,m2) for the power law + peak mass model. 

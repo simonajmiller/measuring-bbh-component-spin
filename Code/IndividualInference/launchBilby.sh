@@ -1,7 +1,7 @@
 #!/bin/bash
 
 . /cvmfs/oasis.opensciencegrid.org/ligo/sw/conda/etc/profile.d/conda.sh
-conda activate /home/simona.miller/.conda/envs/bilby_201
+conda activate igwn-py39
 
 job=$1
 json=$2

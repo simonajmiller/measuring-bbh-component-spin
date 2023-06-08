@@ -38,7 +38,6 @@ priorDict = {
     'mu_chi':(0., 1.),
     'sigma_chi':(0.07, 0.5),
     'mu_cost':(-1., 1.),
-    #'sigma_cost':(0.2, 0.8),
     'sigma_cost':(0.16, 0.8),
     'MF_cost':(0., 1.)
 }

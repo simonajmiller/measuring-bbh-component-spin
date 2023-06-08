@@ -23,7 +23,7 @@ f_upper = 4096
 
 # Reference freq and delta_f for everything
 delta_f = 1.
-f_ref = 50.
+f_ref = 20.
 
 # Prepare detector object
 H1 = Detector("H1")
@@ -38,9 +38,6 @@ target = 50000
 
 # for mass distribution
 lambda_peak=0.033
-
-# minimum mass for injections: 
-M_MIN = 5
 
 # Arrays to hold injection values
 saved_m1s = np.zeros(target)
@@ -112,13 +109,13 @@ while n_det<target:
     # Random primary mass
     c_m1 = np.random.random()
     if np.random.rand() > lambda_peak: # in power law part of distribution 
-        m1 = inv_cdf_m1_PL(c_m1, mMin=M_MIN)
+        m1 = inv_cdf_m1_PL(c_m1)
     else: # in gaussian peak part of distribution
-        m1 = inv_cdf_m1_gaussian(c_m1, mMin=M_MIN)
+        m1 = inv_cdf_m1_gaussian(c_m1)
 
     # Random m2
     c_m2 = np.random.random()
-    m2 = inv_cdf_m2(c_m2, m1, mMin=M_MIN)
+    m2 = inv_cdf_m2(c_m2, m1)
 
     # Random redshift
     cz = np.random.random()
