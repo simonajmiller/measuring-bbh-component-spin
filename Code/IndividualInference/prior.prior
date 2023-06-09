@@ -1,6 +1,6 @@
 mass_ratio = bilby.gw.prior.UniformInComponentsMassRatio(name='mass_ratio', minimum=0.05,maximum=1)
-mass_1 = Constraint(name='mass_1', minimum=1.001398, maximum=1000),
-mass_2 = Constraint(name='mass_2', minimum=1.001398, maximum=1000),
+mass_1 = Constraint(name='mass_1', minimum=1.001398, maximum=1000)
+mass_2 = Constraint(name='mass_2', minimum=1.001398, maximum=1000)
 
 luminosity_distance = bilby.gw.prior.UniformSourceFrame(name='luminosity_distance', minimum=1e2, maximum=5e3, unit='Mpc')
 

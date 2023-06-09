@@ -15,7 +15,7 @@ pop_names = ['population1_highSpinPrecessing', 'population2_mediumSpin', 'popula
 for j,pop_name in enumerate(pop_names):
 
     # Load in injected population
-    injections = pd.read_json(f'../../Data/InjectedPopulationParameters/{pop_name}.json')
+    injections = pd.read_json(f'../../Data/InjectedPopulationParameters/{pop_name}_fullmassrange.json')
     injections.sort_index(inplace=True)
     n_total = len(injections)
 
