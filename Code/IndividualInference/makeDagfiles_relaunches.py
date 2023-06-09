@@ -42,7 +42,7 @@ for j,pop_name in enumerate(pop_names):
     print(f'Re-launching the following {len(to_inject)} jobs for {pop_name}: ', to_inject, '\n')
     
     # Write dag file in the condor subfolder
-    dagfile=f'./condor/bilby_{pop_name}_relaunch_{todays_date}.dag'
+    dagfile=f'./condor/bilby_{pop_name}_dags/bilby_{pop_name}_relaunch_{todays_date}.dag'
     with open(dagfile,'w') as df: 
         for i in to_inject:
             df.write('JOB {0} {1}Code/IndividualInference/condor/bilby_{2}.sub\n'.format(int(i),root,pop_name))

@@ -9,6 +9,7 @@
 **/old
 **/old_highmass
 **/debugging
+**/.distance_marginalization_lookup.npz
 Code/IndividualInference/*.txt
 Code/PopulationInference/condor/
 Data/IndividualInferenceOutput/**/*.pickle*

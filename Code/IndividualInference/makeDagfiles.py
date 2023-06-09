@@ -26,7 +26,7 @@ for j,pop_name in enumerate(pop_names):
     np.savetxt(f'injlist_{pop_name}_{nevents}events.txt',to_inject,fmt="%d")
 
     # Write dag file in the condor subfolder
-    dagfile=f'./condor/bilby_{pop_name}.dag'
+    dagfile=f'./condor/bilby_{pop_name}_dags/bilby_{pop_name}.dag'
     with open(dagfile,'w') as df: 
         for i in to_inject:
             df.write('JOB {0} {1}Code/IndividualInference/condor/bilby_{2}.sub\n'.format(int(i),root,pop_name))
