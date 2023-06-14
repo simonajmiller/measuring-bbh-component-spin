@@ -2,7 +2,7 @@ mass_ratio = bilby.gw.prior.UniformInComponentsMassRatio(name='mass_ratio', mini
 mass_1 = Constraint(name='mass_1', minimum=1.001398, maximum=1000)
 mass_2 = Constraint(name='mass_2', minimum=1.001398, maximum=1000)
 
-luminosity_distance = bilby.gw.prior.UniformSourceFrame(name='luminosity_distance', minimum=1e2, maximum=5e3, unit='Mpc')
+luminosity_distance = bilby.gw.prior.UniformSourceFrame(name='luminosity_distance', minimum=1e2, maximum=1.2e4, unit='Mpc')
 
 zenith = Sine(name='zenith')
 azimuth = Uniform(name='azimuth', minimum=0, maximum=2 * np.pi, boundary='periodic')
