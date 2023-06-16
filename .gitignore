@@ -15,6 +15,7 @@ Code/PopulationInference/condor/
 Data/IndividualInferenceOutput/**/*.pickle*
 Data/IndividualInferenceOutput/**/*.png
 Data/IndividualInferenceOutput/**/*.txt
+Data/InjectedPopulationParameters/will-farr-selection-effects-comparison.h5
 Code/IndividualInference/condor/.distance_marginalization_lookup.npz
 Data/PopulationInferenceOutput/.tmp/
 Data/PopulationInferenceOutput/inspect_betaPlusDoubleGaussian+.ipynb
