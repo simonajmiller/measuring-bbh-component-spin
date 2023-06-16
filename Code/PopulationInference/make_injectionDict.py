@@ -43,7 +43,7 @@ DL_ref = cosmo.luminosity_distance(zs_ref).to(u.Mpc).value
 Calculate injectionDict for each event
 '''
 
-# Load in detected population from flat injection
+# Load in detected population from injections flat in chi and cos(theta)
 detected_pop = pd.read_json(f'../../Data/InjectedPopulationParameters/flat_pop_full_mass_range_for_injection_dict.json')
 
 # Detected values for paramters of interest (spins, masses, redshift, dVdz) 
