@@ -21,7 +21,7 @@ date = sys.argv[4]
 
 # Model
 model = "betaPlusDoubleGaussian"
-model_savename = model + f"_pop{pop}_{nevents}events_highmass_{date}" 
+model_savename = model + f"_pop{pop}_{nevents}events_{date}" 
 
 print(f'Running {model_savename} ...')
 
@@ -48,17 +48,8 @@ pop_names = {
     '2':'population2_mediumSpin',
     '3':'population3_lowSpinAligned'
 }
-with open(froot+f"PopulationInferenceInput/sampleDict_{pop_names[pop]}_highmass_temp.json", 'r') as f: 
-    sampleDict_1 = json.load(f)
-
-# Supplement with events from our old repo (300->400 total events now at our disposal)
-old_root = '/home/simona.miller/comp-spin-mock-injections/Data/'
-with open(f'{old_root}PopulationInferenceInput/sampleDict_{pop_names[pop]}_highmass_newbilby.json') as f:
-    sampleDict_2_temp = json.load(f)
-    sampleDict_2 = {k+'a':v for k,v in sampleDict_2_temp.items()} # rename the keys for the supplment in case there are duplicate keys
-    
-# Merge the two sampleDicts into one 
-sampleDict_full = {**sampleDict_1, **sampleDict_2}
+with open(froot+f"PopulationInferenceInput/sampleDict_{pop_names[pop]}_full_mass_range_temp.json", 'r') as f: 
+    sampleDict_full = json.load(f)
     
 # Choose subset of sampleDict if necessary
 if int(nevents)<400: 
@@ -69,7 +60,7 @@ else:
     sampleDict = sampleDict_full
     
 # Load injectionDict
-with open(froot+"PopulationInferenceInput/injectionDict.json", 'r') as f: 
+with open(froot+"PopulationInferenceInput/injectionDict_full_mass_range.json", 'r') as f: 
     injectionDict = json.load(f)
 
 # Will save emcee chains temporarily in the .tmp folder in this directory
@@ -100,19 +91,6 @@ if len(old_chains)==0:
         '3':[0.19, 0.12, -0.98, 0.44, 0.98, 0.31, 0.26, 0.96]
     }
     initial_walkers = np.transpose([draw_initial_walkers_uniform(nWalkers, (hyperparams[pop][i]-0.02, hyperparams[pop][i]+0.02)) for i in range(dim)])
-    
-#     initial_mu_chis = draw_initial_walkers_uniform(nWalkers, (0.2,0.4)) 
-#     initial_sigma_chis = draw_initial_walkers_uniform(nWalkers, (0.17,0.25))
-#     initial_mu_costs = draw_initial_walkers_uniform(2*nWalkers, (0.2,0.4))
-#     initial_sigma_costs = draw_initial_walkers_uniform(2*nWalkers, (0.4,0.5))
-#     initial_MF_costs = draw_initial_walkers_uniform(nWalkers, (0,1))
-#     initial_Bqs = np.random.normal(loc=0, scale=3, size=nWalkers)
-    
-#     # Put together all initial walkers into a single array
-#     initial_walkers = np.transpose(
-#         [initial_mu_chis, initial_sigma_chis, initial_mu_costs[:nWalkers], initial_sigma_costs[:nWalkers], 
-#          initial_mu_costs[nWalkers:], initial_sigma_costs[nWalkers:], initial_MF_costs, initial_Bqs]
-#     )
             
 # Otherwise resume existing chain
 else:

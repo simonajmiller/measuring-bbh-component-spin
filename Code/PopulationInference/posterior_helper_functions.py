@@ -2,6 +2,12 @@ import numpy as np
 from scipy.special import erf
 from scipy.special import beta
 from math import gamma
+import sys
+sys.path.append('/home/simona.miller/measuring-bbh-component-spin/Code/GeneratePopulations/')
+from helper_functions import mu_sigma2_to_a_b
+from helper_functions import p_astro_masses, smoothing_fxn
+from helper_functions import p_z as p_astro_z
+
 
 def draw_initial_walkers_uniform(num_walkers, bounds): 
     
@@ -151,33 +157,6 @@ def calculate_Double_Gaussian(x, mu1, sigma1, mu2, sigma2, f, low, high):
     y[x>high] = 0
 
     return y
-    
-def mu_sigma2_to_a_b(mu, sigma2): 
-    
-    """
-    Function to transform between the mean and variance of a beta distribution 
-    to the shape parameters a and b.
-    See https://en.wikipedia.org/wiki/Beta_distribution.
-    
-    Parameters
-    ----------
-    x : `numpy.array`
-        input samples on which to evaluate beta distribution
-    mu : float
-        mean of the beta distributoin
-    sigma2 : float
-        variance of the beta distribution
-    
-    Returns
-    -------
-    a,b : floats
-        shape parameters of the beta distribution
-    """
-    
-    a = (mu**2.)*(1-mu)/sigma2 - mu
-    b = mu*((1-mu)**2.)/sigma2 + mu - 1
-    
-    return a,b
 
 def calculate_betaDistribution(x, a, b): 
     
@@ -204,106 +183,3 @@ def calculate_betaDistribution(x, a, b):
     y = np.power(x, a-1)*np.power(1-x, b-1)/B
     
     return y
-
-def smoothing_fxn(m, deltaM): 
-    
-    """
-    Smoothing function that goes into the p_astro(m1,m2) calculation for the power law + peak mass model.
-    See eqn. B5 in https://arxiv.org/pdf/2111.03634.pdf
-    
-    Parameters
-    ----------
-    m : `numpy.array`
-        mass samples to calculate smoothing over
-    deltaM : float
-        Range of mass tapering at the lower end of the mass distribution
-    
-    Returns
-    -------
-    S : `numpy.array`
-        the smoothing function evaluated at the input samples m
-    """
-    
-    f = np.exp(deltaM/m + deltaM/(m-deltaM))
-    S = 1/(f+1)
-    
-    return S
-
-def p_astro_masses(m1, m2, alpha=-3.51, bq=0.96, mMin=6.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
-    
-    """
-    Function to calculate for p_astro(m1,m2) for the power law + peak mass model. 
-    See table VI in https://arxiv.org/pdf/2111.03634.pdf
-    
-    Default parameters are those corresponding to the median values reported in 
-    https://arxiv.org/pdf/2111.03634.pdf
-    
-    Parameters
-    ----------
-    m1 : `numpy.array`
-        primary mass samples
-    m2 : `numpy.array`
-        secondary mass  samples
-    alpha : float
-        Spectral index for the power-law of the primary mass distribution
-    bq : float
-        Spectral index for the power-law of the mass ratio distribution
-    mMin : float
-        Minimum mass of the power-law component of the primary mass distribution
-    mMax : float
-        Maximum mass of the power-law component of the primary mass distribution
-    lambda_peak : float
-        Fraction of BBH systems in the Gaussian component
-    m0 : float
-        Mean of the Gaussian component in the primary mass distribution
-    sigM : float
-        Width of the Gaussian component in the primary mass distribution
-    deltaM : float
-        Range of mass tapering at the lower end of the mass distribution
-    
-    Returns
-    -------
-    p_masses : `numpy.array`
-        the power law + peak mass model evaluated at the input samples m1 and m2
-    """
-    
-    # p(m1):
-    # power law for m1:
-    p_m1_pl = (1.+alpha)*m1**alpha/(mMax**(1.+alpha) - mMin**(1.+alpha))
-    p_m1_pl[m1>mMax] = 0.
-    # gaussian peak
-    p_m1_peak = np.exp(-0.5*(m1-m0)**2./sigM**2)/np.sqrt(2.*np.pi*sigM**2.)
-    p_m1 = lambda_peak*p_m1_peak + (1.-lambda_peak)*p_m1_pl
-    # smoothing fxn 
-    p_m1[m1<mMin+deltaM] = p_m1[m1<mMin+deltaM]*smoothing_fxn(m1[m1<mMin+deltaM]-mMin,deltaM)
-    
-    # p(m2):
-    # power law for m2 conditional on m1:
-    p_m2 = (1.+bq)*np.power(m2,bq)/(np.power(m1,1.+bq)-mMin**(1.+bq))
-    p_m2[m2<mMin]=0
-    
-    p_masses = p_m1*p_m2
-    
-    return p_masses
-    
-def p_astro_z(z, dVdz, kappa=2.7):
-    
-    """
-    Function to calculate p_astro(z) for a power law model in (1+z)
-
-    Parameters
-    ----------
-    z : `numpy.array`
-        redshift samples
-    dVdz : `numpy.array`
-        d(comoving volume)/dz samples
-    
-    Returns
-    -------
-    p_z : `numpy.array`
-        p_astro(z) evaluated at the input samples
-    """
-    
-    p_z = dVdz*np.power(1.+z,kappa-1.)
-    
-    return p_z

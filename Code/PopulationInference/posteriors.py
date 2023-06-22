@@ -130,8 +130,8 @@ def betaPlusDoubleGaussian(c,sampleDict,injectionDict,priorDict):
         pdet_spins = p_chi1_det*p_chi2_det*p_cost1_det*p_cost2_det
         
         # Detected masses and redshifts
-        pdet_masses = p_astro_masses(m1_det, m2_det, bq=Bq, mMin=20.)
-        pdet_z = p_astro_z(z_det, dVdz_det)
+        pdet_masses = p_astro_masses(m1_det, m2_det, bq=Bq)
+        pdet_z = p_astro_z(z_det, dV_dz=dVdz_det)
         
         # Construct full weighting factors
         p_det = pdet_spins*pdet_masses*pdet_z
@@ -175,11 +175,11 @@ def betaPlusDoubleGaussian(c,sampleDict,injectionDict,priorDict):
                         
             # Need to reweight by astrophysical priors on m1, m2, z ...
             # - p(m1)*p(m2)
-            p_astro_m1_m2 = p_astro_masses(m1_samples, m2_samples, bq=Bq, mMin=20.)
+            p_astro_m1_m2 = p_astro_masses(m1_samples, m2_samples, bq=Bq)
             old_m1_m2_prior = np.power(1.+z_samples, 2) # PE prior on masses is uniform in DETECTOR FRAME component masses
             # - p(z)
-            p_astro_redshift = p_astro_z(z_samples, dVdz_samples)
-            old_z_prior = p_astro_z(z_samples, dVdz_samples, kappa=0) # see: bilby.gw.prior.UniformSourceFrame prior 
+            p_astro_redshift = p_astro_z(z_samples, dV_dz=dVdz_samples)
+            old_z_prior = p_astro_z(z_samples, dV_dz=dVdz_samples, kappa=0) # see: bilby.gw.prior.UniformSourceFrame prior 
             # - For full m1, m2, z prior reweighting: 
             m1_m2_z_prior_ratio = (p_astro_m1_m2/old_m1_m2_prior)*(p_astro_redshift/old_z_prior) 
             
@@ -323,8 +323,8 @@ def betaPlusGaussian(c,sampleDict,injectionDict,priorDict):
         pdet_spins = p_chi1_det*p_chi2_det*p_cost1_det*p_cost2_det
         
         # Detected masses and redshifts
-        pdet_masses = p_astro_masses(m1_det, m2_det, bq=Bq, mMin=20.) #TODO: highmass or full mass??
-        pdet_z = p_astro_z(z_det, dVdz_det)
+        pdet_masses = p_astro_masses(m1_det, m2_det, bq=Bq)
+        pdet_z = p_astro_z(z_det, dV_dz=dVdz_det)
         
         # Construct full weighting factors
         p_det = pdet_spins*pdet_masses*pdet_z
@@ -368,11 +368,11 @@ def betaPlusGaussian(c,sampleDict,injectionDict,priorDict):
                         
             # Need to reweight by astrophysical priors on m1, m2, z ...
             # - p(m1)*p(m2)
-            p_astro_m1_m2 = p_astro_masses(m1_samples, m2_samples, bq=Bq, mMin=20.) #TODO: highmass or full mass??
+            p_astro_m1_m2 = p_astro_masses(m1_samples, m2_samples, bq=Bq)
             old_m1_m2_prior = np.power(1.+z_samples, 2) # PE prior on masses is uniform in DETECTOR FRAME component masses
             # - p(z)
-            p_astro_redshift = p_astro_z(z_samples, dVdz_samples)
-            old_z_prior = p_astro_z(z_samples, dVdz_samples, kappa=0) # see: bilby.gw.prior.UniformSourceFrame prior 
+            p_astro_redshift = p_astro_z(z_samples, dV_dz=dVdz_samples)
+            old_z_prior = p_astro_z(z_samples, dV_dz=dVdz_samples, kappa=0) # see: bilby.gw.prior.UniformSourceFrame prior 
             # - For full m1, m2, z prior reweighting: 
             m1_m2_z_prior_ratio = (p_astro_m1_m2/old_m1_m2_prior)*(p_astro_redshift/old_z_prior) 
             

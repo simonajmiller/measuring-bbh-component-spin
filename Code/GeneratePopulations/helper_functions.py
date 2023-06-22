@@ -123,7 +123,7 @@ def dVdz(z):
     return dV_dz
 
 
-def p_z(z, kappa=2.7):
+def p_z(z, dV_dz=None, kappa=2.7):
     """
     Function to calculate p(z) for a power law model in (1+z)
 
@@ -139,7 +139,9 @@ def p_z(z, kappa=2.7):
     p_z : `numpy.array`
         p_astro(z) evaluated at the input samples
     """
-    dV_dz = dVdz(z)
+    if dV_dz is None:
+        dV_dz = dVdz(z)
+        
     p_z = dV_dz*np.power(1.+z,kappa-1.)
     
     return p_z

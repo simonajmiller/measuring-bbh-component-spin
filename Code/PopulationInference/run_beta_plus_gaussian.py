@@ -47,17 +47,8 @@ pop_names = {
     '2':'population2_mediumSpin',
     '3':'population3_lowSpinAligned'
 }
-with open(froot+f"PopulationInferenceInput/sampleDict_{pop_names[pop]}_highmass_temp.json", 'r') as f: 
-    sampleDict_1 = json.load(f)
-
-# Supplement with events from our old repo (300->400 total events now at our disposal)
-old_root = '/home/simona.miller/comp-spin-mock-injections/Data/'
-with open(f'{old_root}PopulationInferenceInput/sampleDict_{pop_names[pop]}_highmass_newbilby.json') as f:
-    sampleDict_2_temp = json.load(f)
-    sampleDict_2 = {k+'a':v for k,v in sampleDict_2_temp.items()} # rename the keys for the supplment in case there are duplicate keys
-    
-# Merge the two sampleDicts into one 
-sampleDict_full = {**sampleDict_1, **sampleDict_2}
+with open(froot+f"PopulationInferenceInput/sampleDict_{pop_names[pop]}_full_mass_range_temp.json", 'r') as f: 
+    sampleDict_full = json.load(f)
     
 # Choose subset of sampleDict if necessary
 if int(nevents)<400: 
@@ -68,11 +59,11 @@ else:
     sampleDict = sampleDict_full
     
 # Load injectionDict
-with open(froot+"PopulationInferenceInput/injectionDict.json", 'r') as f: 
+with open(froot+"PopulationInferenceInput/injectionDict_full_mass_range.json", 'r') as f: 
     injectionDict = json.load(f)
 
 # Will save emcee chains temporarily in the .tmp folder in this directory
-output_folder_tmp = froot+f"PopulationInferenceOutput/.tmp/"
+output_folder_tmp = froot+"PopulationInferenceOutput/.tmp/"
 output_tmp = output_folder_tmp+model_savename
 
 
