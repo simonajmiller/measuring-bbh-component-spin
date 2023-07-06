@@ -79,10 +79,14 @@ for pop in pop_names:
                 print(e, end='\r') 
                 
         else:
-            print(f"event {int(event)} not found")
+            #print(f"event {int(event)} not found")
+            pass
             
+    print('\nNumber of events in pop: ')
+    print(len(sampleDict.keys()))
+    
     # Save sampleDict in folder where population inference input goes 
-    with open(f'../../Data/PopulationInferenceInput/sampleDict_{pop}_full_mass_range_temp.json', 'w') as f:
+    with open(f'../../Data/PopulationInferenceInput/sampleDict_{pop}_full_mass_range.json', 'w') as f:
         json.dump(sampleDict, f)
     
         

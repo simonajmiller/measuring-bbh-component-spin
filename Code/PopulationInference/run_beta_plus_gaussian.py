@@ -1,4 +1,5 @@
 import numpy as np
+import argparse
 import glob
 import emcee as mc
 import json
@@ -7,21 +8,33 @@ from posterior_helper_functions import draw_initial_walkers_uniform
 from posteriors import betaPlusGaussian
 from postprocessing import processEmceeChain 
 
-# set seed for reproducibility (number chosen arbitrarily)
-np.random.seed(2647)
-
 """
 Definitions and loading data
 """
 
-# Pass population and number of events via commandline 
-pop = sys.argv[1]
-nevents = sys.argv[2]
-date = sys.argv[4]
+# Parse commandline arguments
+p = argparse.ArgumentParser()
+p.add_argument('--date')
+p.add_argument('--pop')
+p.add_argument('--nevents', type=int)
+p.add_argument('--nsteps', type=int)
+p.add_argument('--seed', type=int, default=0)
+args = p.parse_args()
+
+# Pass population and number of events via commandline
+pop = args.pop
+nevents = args.nevents
 
 # Model
 model = "betaPlusGaussian"
-model_savename = model + f"_pop{pop}_{nevents}events_highmass_{date}" 
+if args.seed!=0:
+    model_savename = f"{args.date}_{model}_pop{pop}_{nevents}events_{seed}" 
+else:
+    model_savename = f"{args.date}_{model}_pop{pop}_{nevents}events"
+    
+# set seed for reproducibility
+seed = args.seed if args.seed!=0 else 2346 # arbitrary
+np.random.seed(seed)
 
 print(f'Running {model_savename} ...')
 
@@ -31,7 +44,7 @@ froot = "/home/simona.miller/measuring-bbh-component-spin/Data/"
 # Define emcee parameters
 nWalkers = 20       # number of walkers 
 dim = 5             # dimension of parameter space (number hyper params)
-nSteps = int(sys.argv[3])      # number of steps for chain
+nSteps = args.nsteps    # number of steps for chain
 
 # Set prior bounds
 priorDict = {
@@ -47,7 +60,7 @@ pop_names = {
     '2':'population2_mediumSpin',
     '3':'population3_lowSpinAligned'
 }
-with open(froot+f"PopulationInferenceInput/sampleDict_{pop_names[pop]}_full_mass_range_temp.json", 'r') as f: 
+with open(froot+f"PopulationInferenceInput/sampleDict_{pop_names[pop]}_full_mass_range.json", 'r') as f: 
     sampleDict_full = json.load(f)
     
 # Choose subset of sampleDict if necessary
@@ -200,7 +213,8 @@ results = {
     'Bq':{'unprocessed':chainRaw[:,:,4].tolist(), 'processed':chainDownsampled[:,4].tolist()}, 
     'Neff':blobsDownsampled['Neff'].tolist(),
     'minNsamps':blobsDownsampled['minNsamps'].tolist(), 
-    'logL':blobsDownsampled['logL'].tolist()
+    'logL':blobsDownsampled['logL'].tolist(), 
+    'events_used':[str(k) for k in sampleDict.keys()]
 } 
 
 # Save
