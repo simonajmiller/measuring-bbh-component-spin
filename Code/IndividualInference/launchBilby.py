@@ -6,6 +6,7 @@ import pandas as pd
 from bilby.core.prior.base import Constraint
 from lalsimulation import SimInspiralTransformPrecessingWvf2PE
 from lal import GreenwichMeanSiderealTime
+import json
 
 # helpful tutorial: https://git.ligo.org/lscsoft/bilby/blob/master/examples/gw_examples/injection_examples/standard_15d_cbc_tutorial.py
 
@@ -78,7 +79,6 @@ injection_parameters = dict(
     ra=injection.ra, \
     dec=injection.dec
 )
-
 
 print(injection_parameters)
 
@@ -163,7 +163,19 @@ priors['geocent_time'] = bilby.core.prior.Uniform(
 inj_chirpmass = np.power(m1_det_inj*m2_det_inj, 3./5)/np.power(m1_det_inj+m2_det_inj, 1./5)
 minChirpMass = max(2, inj_chirpmass-15)
 maxChirpMass = min(200, inj_chirpmass+15)
-priors["chirp_mass"] = bilby.gw.prior.UniformInComponentsChirpMass(name='chirp_mass', minimum=minChirpMass, maximum=maxChirpMass)               
+priors["chirp_mass"] = bilby.gw.prior.UniformInComponentsChirpMass(name='chirp_mass', minimum=minChirpMass, maximum=maxChirpMass)
+
+# For certain jobs, also constrain distance prior: 
+with open(directory+'Code/IndividualInference/to_inject_dict_070523.json', 'r') as f:
+    redos = json.load(f)
+pop_key = args.outdir.split('/')[-1]
+if args.job in redos[pop_key]: 
+    minDL = max(1e2, injection.Dl/2)
+    maxDL = min(1.2e4 , injection.Dl*2)
+else: 
+    minDL = 1e2
+    maxDL = 1.2e4  
+priors["luminosity_distance"] = bilby.gw.prior.UniformSourceFrame(name='luminosity_distance', minimum=minDL, maximum=maxDL, unit='Mpc')
 
 
 """
