@@ -159,11 +159,17 @@ priors['geocent_time'] = bilby.core.prior.Uniform(
     unit='$s$'
 )
 
-# ... and we constrain chirp mass to be +/- 15 solar masses about the injected value, in the detector frame
+# ... and we constrain chirp mass to be +/- 15 solar masses about the injected value, in the detector frame,
+# unless in a low mass binary, in which case need tighter priors 
 inj_chirpmass = np.power(m1_det_inj*m2_det_inj, 3./5)/np.power(m1_det_inj+m2_det_inj, 1./5)
-minChirpMass = max(2, inj_chirpmass-15)
-maxChirpMass = min(200, inj_chirpmass+15)
+if inj_chirpmass < 7:
+    minChirpMass = 2
+    maxChirpMass = inj_chirpmass*2
+else: 
+    minChirpMass = max(2, inj_chirpmass-15)
+    maxChirpMass = min(200, inj_chirpmass+15)
 priors["chirp_mass"] = bilby.gw.prior.UniformInComponentsChirpMass(name='chirp_mass', minimum=minChirpMass, maximum=maxChirpMass)
+
 
 # For certain jobs, also constrain distance prior: 
 with open(directory+'Code/IndividualInference/to_inject_dict_070523.json', 'r') as f:
@@ -176,6 +182,7 @@ else:
     minDL = 1e2
     maxDL = 1.2e4  
 priors["luminosity_distance"] = bilby.gw.prior.UniformSourceFrame(name='luminosity_distance', minimum=minDL, maximum=maxDL, unit='Mpc')
+
 
 
 """

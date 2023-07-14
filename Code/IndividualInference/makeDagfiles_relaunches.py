@@ -10,8 +10,8 @@ root = '/home/simona.miller/measuring-bbh-component-spin/'
 # cycle through populations
 pop_names = ['population1_highSpinPrecessing', 'population2_mediumSpin', 'population3_lowSpinAligned']
 
-# today's date 
-date = '070523'
+# today's date, passed via commandline
+date = sys.argv[1]
 
 # Load in dict of jobs to relaunch
 to_inject_dict_fname = f'to_inject_dict_{date}.json'
@@ -28,12 +28,21 @@ for j,pop_name in enumerate(pop_names):
     # Set to inject
     to_inject = to_inject_dict[pop_name]
     
+    # Save as text file for reference
+    np.savetxt(f'injlist_{pop_name}_relaunch_{date}.txt', np.sort(to_inject) ,fmt="%d")
+    
     # Delete all old files for that job 
     for job in to_inject:
+        
+        # bilby outputs
         fpath = f'{root}Data/IndividualInferenceOutput/{pop_name}/'+'job_{0:05d}'.format(int(job))
         os.system(f"rm {fpath}*")
-        fpath2 = f'{root}Data/IndividualInferenceOutput/{pop_name}/'+'.job_{0:05d}'.format(int(job))
+        fpath2 = fpath.replace('job', '.job')
         os.system(f"rm {fpath2}*")
+        
+        # condor logs
+        fpath3 = f'./condor/logs/pop{pop_name[10]}/job_{int(job)}'
+        os.system(f"rm {fpath3}*")
     
     # Write dag file in the condor subfolder
     dagfile=f'./condor/bilby_{pop_name}_dags/bilby_{pop_name}_relaunch_{date}.dag'
