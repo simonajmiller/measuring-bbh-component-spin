@@ -68,11 +68,6 @@ print(f'Running {model_savename} ...')
 # File path root for where to store data 
 froot = "/home/simona.miller/measuring-bbh-component-spin/Data/"
 
-# Define emcee parameters
-nWalkers = 20       # number of walkers 
-dim = 8             # dimension of parameter space (number hyper params)
-nSteps = args.nsteps    # number of steps for chain
-
 # Names of the different populations
 pop_names = {
     '1':'population1_highSpinPrecessing', 
@@ -154,6 +149,14 @@ output_tmp = output_folder_tmp+model_savename
 """
 Initializing emcee walkers or picking up where an old chain left off.
 """
+
+# Define emcee parameters
+nWalkers = 20       # number of walkers 
+nSteps = args.nsteps    # number of steps for chain
+if model=='betaPlusDoubleGaussian': # dimension of parameter space (number hyper params)
+    dim = 8             
+elif model=='betaPlusGaussian': 
+    dim = 5
 
 # Set prior bounds 
 priorDict = {
