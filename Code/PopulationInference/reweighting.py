@@ -18,7 +18,7 @@ Function to do posterior reweighting
     
 """
 
-def pop_reweight(sampleDict, hyperPEDict): 
+def pop_reweight(sampleDict, hyperPEDict, model): 
     
     # Number of hyperparameter samples
     nHyperPESamps = len(hyperPEDict['mu_chi']['processed'])
@@ -173,39 +173,48 @@ if __name__=="__main__":
     froot = '../../Data/'
     
     # Run settings we want to reweight
-    dates = ['070523']
-    models = ['betaPlusGaussian', 'betaPlusDoubleGaussian']
+    date = '071823'
+    models = ['betaPlusGaussian']
     pops = ['1', '2', '3']
-    nevents = ['330']
+    nevents = ['70']
+    posterior_keys = ['gaussian_sigma_0.1', 'gaussian_sigma_0.2', 'gaussian_sigma_0.3',
+                 'gaussian_sigma_0.4', 'gaussian_sigma_0.5', 'gaussian_sigma_1']
         
     # Cycle through them all 
-    for date in dates: 
-        for model in models:
-            for pop in pops: 
-                for nevent in nevents: 
-                    
-                    print(f'{date}, {model}, pop {pop}, {nevent} events')
-    
+    for model in models:
+        for pop in pops: 
+            for nevent in nevents:
+                for posterior_key in posterior_keys:
+
+                    print(f'{date}, {model}, pop {pop}, {nevent} events, {posterior_key} samples')
+
                     # Cycle through runs we want to reweight
+                    filename = f'PopulationInferenceOutput/{model}/{date}_{model}_pop{pop}_{nevent}events_{posterior_key}'
 
                     # Load dict with individual event PE samples (Load sampleDict):
                     with open(froot+f'PopulationInferenceInput/sampleDict_{pop_names_dict[pop]}_full_mass_range.json') as f:
                         sampleDict_full = json.load(f) 
 
                     # Load population parameter PE samps
-                    with open(froot+f'PopulationInferenceOutput/{model}/{date}_{model}_pop{pop}_{nevent}events.json', 'r') as f:
+                    with open(froot+filename+'.json', 'r') as f:
                         hyperPEDict = json.load(f)
 
                     # Select only events from sampleDict used in this emcee run
                     events = hyperPEDict['events_used']
-                    sampleDict = {event:sampleDict_full[event] for event in events}
+                    sampleDict = {}
+                    for event in events:
+                        # for masses and redshifts always use bilby posteriors
+                        d1 = {p:sampleDict_full[event][p] for p in ['m1', 'm2', 'z', 'dVc_dz']}
+                        # for spin magnitude and tilts, option to use bilby or gaussian posteriors
+                        d2 = {p:sampleDict_full[event][p][posterior_key] for p in ['a1', 'a2', 'cost1', 'cost2']}
+                        # combine into final sampleDict
+                        sampleDict[event] = {**d1, **d2}
 
-                    # Run reweighting for default model
-                    sampleDict_rw = pop_reweight(sampleDict, hyperPEDict)   
+                    # Run reweighting 
+                    sampleDict_rw = pop_reweight(sampleDict, hyperPEDict, model)   
 
                     # Save results
-                    savename = froot+f'PopulationInferenceOutput/{model}/{date}_{model}_{pop}_{nevent}events_reweighted_sampleDict.json'
-                    with open(savename, "w") as f:        
+                    with open(froot+filename+'_reweighted_sampleDict.json', "w") as f:        
                         json.dump(sampleDict_rw,f)
-                        
+
                     print('\n') 

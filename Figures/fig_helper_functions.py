@@ -1,8 +1,14 @@
 import numpy as np
 import sys 
+from scipy.stats import gaussian_kde
 
 sys.path.append('/home/simona.miller/measuring-bbh-component-spin/Code/PopulationInference')
 from posterior_helper_functions import *
+
+def reflected_kde_1d(x, A, B, npoints=1000): 
+    grid = np.linspace(A,B,npoints)
+    kde_on_grid = gaussian_kde(x)(grid) + gaussian_kde(2*A-x)(grid) + gaussian_kde(2*B-x)(grid)
+    return grid, kde_on_grid
 
 def calculate_chiEff(chi1, chi2, cost1, cost2, q): 
     chieff = (chi1*cost1 + q*chi2*cost2)/(1+q)

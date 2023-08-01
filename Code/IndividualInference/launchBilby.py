@@ -161,29 +161,20 @@ priors['geocent_time'] = bilby.core.prior.Uniform(
 
 # ... and we constrain chirp mass to be +/- 15 solar masses about the injected value, in the detector frame,
 # unless in a low mass binary, in which case need tighter priors 
+# Also constrain luminosity distance further for low mass binaries
 inj_chirpmass = np.power(m1_det_inj*m2_det_inj, 3./5)/np.power(m1_det_inj+m2_det_inj, 1./5)
-if inj_chirpmass < 7:
-    minChirpMass = 2
-    maxChirpMass = inj_chirpmass*2
+if inj_chirpmass < 8:
+    minChirpMass = inj_chirpmass*0.9
+    maxChirpMass = inj_chirpmass*1.1
+    minDL = max(1e2, injection.Dl/2 - 100)
+    maxDL = min(1.2e4 , injection.Dl*2 + 100)
 else: 
     minChirpMass = max(2, inj_chirpmass-15)
     maxChirpMass = min(200, inj_chirpmass+15)
-priors["chirp_mass"] = bilby.gw.prior.UniformInComponentsChirpMass(name='chirp_mass', minimum=minChirpMass, maximum=maxChirpMass)
-
-
-# For certain jobs, also constrain distance prior: 
-with open(directory+'Code/IndividualInference/to_inject_dict_070523.json', 'r') as f:
-    redos = json.load(f)
-pop_key = args.outdir.split('/')[-1]
-if args.job in redos[pop_key]: 
-    minDL = max(1e2, injection.Dl/2)
-    maxDL = min(1.2e4 , injection.Dl*2)
-else: 
     minDL = 1e2
     maxDL = 1.2e4  
+priors["chirp_mass"] = bilby.gw.prior.UniformInComponentsChirpMass(name='chirp_mass', minimum=minChirpMass, maximum=maxChirpMass)
 priors["luminosity_distance"] = bilby.gw.prior.UniformSourceFrame(name='luminosity_distance', minimum=minDL, maximum=maxDL, unit='Mpc')
-
-
 
 """
 Specify the settings for the likelihood and sampler, and run the sampler
@@ -239,6 +230,7 @@ elif duration_used==16:
         **likelihood_kwargs_both, 
         highest_mode = 4,             # Additional likelihood args needed for the Multibanding likelihood
         linear_interpolation = False,
+        reference_chirp_mass = inj_chirpmass
     )
     
     sampler_kwargs = {

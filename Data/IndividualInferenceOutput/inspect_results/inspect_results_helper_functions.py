@@ -80,5 +80,9 @@ def is_file_older_than_one_day(file_path):
         return True
     else:
         return False
-
-
+    
+    
+def chirpmass(m1, m2): 
+    q = m2/m1
+    Mc = (q/(1.+q)**2)**(3./5.)*(m1+m2)
+    return Mc
