@@ -25,3 +25,4 @@ Code/PopulationInference/debugging/
 Data/PopulationInferenceOutput/inspect_betaPlusDoubleGaussianJustSpin.ipynb
 Data/PopulationInferenceOutput/inspect_betaPlusDoubleGaussian_withSNRCut.ipynb
 Data/InjectedPopulationParameters/fix_pm1.ipynb
+Data/PopulationInferenceInput/view_injectionDict_and_sampleDicts.ipynb
