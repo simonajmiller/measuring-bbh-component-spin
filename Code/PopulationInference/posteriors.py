@@ -130,7 +130,7 @@ def betaPlusDoubleGaussian(c,sampleDict,injectionDict,priorDict):
         pdet_spins = p_chi1_det*p_chi2_det*p_cost1_det*p_cost2_det
         
         # Detected masses and redshifts
-        pdet_masses = p_astro_masses(m1_det, m2_det, bq=Bq)
+        pdet_masses = p_astro_masses(m1_det, m2_det, bq=Bq, mCut=8)
         pdet_z = p_astro_z(z_det, dV_dz=dVdz_det)
         
         # Construct full weighting factors
@@ -175,7 +175,7 @@ def betaPlusDoubleGaussian(c,sampleDict,injectionDict,priorDict):
                         
             # Need to reweight by astrophysical priors on m1, m2, z ...
             # - p(m1)*p(m2)
-            p_astro_m1_m2 = p_astro_masses(m1_samples, m2_samples, bq=Bq)
+            p_astro_m1_m2 = p_astro_masses(m1_samples, m2_samples, bq=Bq, mCut=8)
             old_m1_m2_prior = np.power(1.+z_samples, 2) # PE prior on masses is uniform in DETECTOR FRAME component masses
             # - p(z)
             p_astro_redshift = p_astro_z(z_samples, dV_dz=dVdz_samples)
@@ -323,7 +323,7 @@ def betaPlusGaussian(c,sampleDict,injectionDict,priorDict):
         pdet_spins = p_chi1_det*p_chi2_det*p_cost1_det*p_cost2_det
         
         # Detected masses and redshifts
-        pdet_masses = p_astro_masses(m1_det, m2_det, bq=Bq)
+        pdet_masses = p_astro_masses(m1_det, m2_det, bq=Bq, mCut=8)
         pdet_z = p_astro_z(z_det, dV_dz=dVdz_det)
         
         # Construct full weighting factors
@@ -368,7 +368,7 @@ def betaPlusGaussian(c,sampleDict,injectionDict,priorDict):
                         
             # Need to reweight by astrophysical priors on m1, m2, z ...
             # - p(m1)*p(m2)
-            p_astro_m1_m2 = p_astro_masses(m1_samples, m2_samples, bq=Bq)
+            p_astro_m1_m2 = p_astro_masses(m1_samples, m2_samples, bq=Bq, mCut=8)
             old_m1_m2_prior = np.power(1.+z_samples, 2) # PE prior on masses is uniform in DETECTOR FRAME component masses
             # - p(z)
             p_astro_redshift = p_astro_z(z_samples, dV_dz=dVdz_samples)

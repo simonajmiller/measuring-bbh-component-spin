@@ -1,9 +1,4 @@
 import numpy as np
-from pycbc.filter import matchedfilter
-from pycbc.waveform import get_fd_waveform
-from pycbc.detector import Detector
-from pycbc.psd import analytical
-from pycbc.psd import read
 from astropy.cosmology import Planck13,z_at_value
 from scipy.special import erf,erfinv
 import astropy.units as u
@@ -14,27 +9,10 @@ from helper_functions import *
 '''
 Preparation steps 
 '''
-# Waveform approximant to use 
-APPROXIMANT = "IMRPhenomXPHM"
 
-# Low and high freq cutoffs for everything 
-f_lower = 15
-f_upper = 4096
-
-# Reference freq and delta_f for everything
-delta_f = 1.
-f_ref = 20.
-
-# Prepare detector object
-H1 = Detector("H1")
-L1 = Detector("L1")
-V1 = Detector("V1")
-psd_H1 = read.from_txt('./aligo_O3actual_H1.txt',f_upper,delta_f,10,is_asd_file=True)
-psd_L1 = read.from_txt('./aligo_O3actual_L1.txt',f_upper,delta_f,10,is_asd_file=True)
-psd_V1 = read.from_txt('./avirgo_O3actual.txt',f_upper,delta_f,10,is_asd_file=True)
-
-# Want to generate 50000 draws from the population
-target = 50000 
+# Want to generate 500000 draws from the population (need a lot of draws to get our best estimates 
+# using density estimates later) 
+target = 500000 
 
 # for mass distribution
 lambda_peak=0.033

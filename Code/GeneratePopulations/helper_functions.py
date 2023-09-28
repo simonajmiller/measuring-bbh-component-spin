@@ -206,7 +206,33 @@ def smoothing_fxn(m, deltaM):
     return S
 
 
-def p_astro_m1(m1, alpha=-3.51, mMin=6.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88, set_zeros=True): 
+def PL(x, alpha, x_min, x_max): 
+    
+    """
+    Normalization power law with slope alpha, between x_min and x_max
+    
+    Parameters
+    ----------
+    x : `numpy.array`
+        input samples 
+    alpha : float
+        apectral index for the power-law
+    x_min : float
+        min for the power-law
+    x_max : float
+        max for the power-law
+    
+    Returns
+    -------
+    pl : `numpy.array`
+        the power law at samples x
+    """
+    
+    pl = (1.+alpha)*x**alpha/(x_max**(1.+alpha) - x_min**(1.+alpha))
+    return pl 
+
+
+def p_astro_m1(m1, alpha=-3.51, mMin=6.00, mMax=88.21, mCut=None, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88, set_zeros=True): 
     
     """
     Function to calculate for p_astro(m1) for the power law + peak mass model. 
@@ -225,6 +251,9 @@ def p_astro_m1(m1, alpha=-3.51, mMin=6.00, mMax=88.21, lambda_peak=0.033, m0=33.
         Minimum mass of the power-law component of the primary mass distribution
     mMax : float
         Maximum mass of the power-law component of the primary mass distribution
+    mCut : float 
+        Cutoff mass for mass distribution; defaults to the same as mMin -- changes 
+        the normalization 
     lambda_peak : float
         Fraction of BBH systems in the Gaussian component
     m0 : float
@@ -240,24 +269,34 @@ def p_astro_m1(m1, alpha=-3.51, mMin=6.00, mMax=88.21, lambda_peak=0.033, m0=33.
         the power law + peak mass model evaluated at the input samples m1
     """
     
-    # power law for m1:
-    p_m1_pl = (1.+alpha)*m1**alpha/(mMax**(1.+alpha) - mMin**(1.+alpha))
+    # assign mCut=mMin if not provided (standard case)
+    if mCut is None: 
+        mCut = mMin
+    
+   # power law
+    p_m1_pl = PL(m1, alpha, mMin, mMax)
     p_m1_pl[m1>mMax] = 0.
     
     # gaussian peak
     p_m1_peak = np.exp(-0.5*(m1-m0)**2./sigM**2)/np.sqrt(2.*np.pi*sigM**2.)
+    
+    # calculate scaling factor based off of mCut vs mMin
+    scalefactor = PL(m0, alpha, mCut, mMax)/ PL(m0, alpha, mMin, mMax)
+    
+    # combine with the correct mixing fraction and scaling
     p_m1 = lambda_peak*p_m1_peak + (1.-lambda_peak)*p_m1_pl
-    
+    p_m1 = p_m1 * scalefactor
+        
     # smoothing fxn 
-    p_m1[m1<mMin+deltaM] = p_m1[m1<mMin+deltaM]*smoothing_fxn(m1[m1<mMin+deltaM]-mMin,deltaM)
+    p_m1[m1<mMin+deltaM] = p_m1[m1<mMin+deltaM]*smoothing_fxn(m1[m1<mMin+deltaM]-mMin, deltaM)
     
-    if set_zeros:
-        p_m1[m1<mMin] = 0.
+    # min mass cut
+    p_m1[m1<mCut]=0
     
     return p_m1
 
 
-def p_astro_masses(m1, m2, alpha=-3.51, bq=0.96, mMin=6.00, mMax=88.21, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
+def p_astro_masses(m1, m2, alpha=-3.51, bq=0.96, mMin=6.00, mMax=88.21, mCut=None, lambda_peak=0.033, m0=33.61, sigM=4.72, deltaM=4.88): 
     
     """
     Function to calculate for p_astro(m1,m2) for the power law + peak mass model. 
@@ -280,6 +319,9 @@ def p_astro_masses(m1, m2, alpha=-3.51, bq=0.96, mMin=6.00, mMax=88.21, lambda_p
         Minimum mass of the power-law component of the primary mass distribution
     mMax : float
         Maximum mass of the power-law component of the primary mass distribution
+    mCut : float 
+        Cutoff mass for mass distribution; defaults to the same as mMin -- changes 
+        the normalization 
     lambda_peak : float
         Fraction of BBH systems in the Gaussian component
     m0 : float
@@ -296,13 +338,15 @@ def p_astro_masses(m1, m2, alpha=-3.51, bq=0.96, mMin=6.00, mMax=88.21, lambda_p
     """
     
     # p(m1):
-    p_m1 = p_astro_m1(m1, alpha=alpha, mMin=mMin, mMax=mMax, 
+    p_m1 = p_astro_m1(m1, alpha=alpha, mMin=mMin, mMax=mMax, mCut=mCut, 
                       lambda_peak=lambda_peak, m0=m0, sigM=sigM, deltaM=deltaM, set_zeros=False)
     
     # p(m2):
     # power law for m2 conditional on m1:
-    p_m2 = (1.+bq)*np.power(m2,bq)/(np.power(m1,1.+bq)-mMin**(1.+bq))
-    p_m2[m2<mMin]=0
+    if mCut is None: 
+        mCut = mMin
+    p_m2 = (1.+bq)*np.power(m2,bq)/(np.power(m1,1.+bq)-mCut**(1.+bq))
+    p_m2[m2<mCut]=0
     
     p_masses = p_m1*p_m2
     

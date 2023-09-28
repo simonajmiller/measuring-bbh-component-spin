@@ -38,8 +38,8 @@ p_draw_spins = p_draw_chi1*p_draw_chi2*p_draw_cost1*p_draw_cost2
 
 # P_draw for masses and redshift - for our injections, this is analytic so just calculate directly
 # (evaluate at detected values, but use injected distribution which here is the best fit GWTC3 
-# power law + peak as found in generate_populations.helper_functions.py)
-p_draw_masses_redshift = p_astro_masses(m1_det, m2_det)*p_astro_z(z_det, dV_dz=dVdz_det)
+# power law + peak as found in GeneratePopulations/helper_functions.py)
+p_draw_masses_redshift = p_astro_masses(m1_det, m2_det, mCut=8)*p_astro_z(z_det, dV_dz=dVdz_det)
 
 # Get rid of events where p_draw==0
 p_draw = p_draw_spins*p_draw_masses_redshift
@@ -62,5 +62,5 @@ injectionDict = {
 }
 
 # Save injectionDict in folder where population inference input goes 
-with open(f'../../Data/PopulationInferenceInput/injectionDict_full_mass_range.json', 'w') as f:
+with open(f'../../Data/PopulationInferenceInput/injectionDict.json', 'w') as f:
     json.dump(injectionDict, f)

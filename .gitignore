@@ -24,3 +24,4 @@ Code/IndividualInference/makeDagfiles_relaunches_manual.py
 Code/PopulationInference/debugging/
 Data/PopulationInferenceOutput/inspect_betaPlusDoubleGaussianJustSpin.ipynb
 Data/PopulationInferenceOutput/inspect_betaPlusDoubleGaussian_withSNRCut.ipynb
+Data/InjectedPopulationParameters/fix_pm1.ipynb

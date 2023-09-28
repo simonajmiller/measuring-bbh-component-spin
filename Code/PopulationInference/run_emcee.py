@@ -12,15 +12,6 @@ from postprocessing import processEmceeChain
 Definitions and loading data
 """
 
-# For calculate cuts in chirpmass
-def chirpmass(m1, m2): 
-    q = m2/m1
-    Mc = (q/(1.+q)**2)**(3./5.)*(m1+m2)
-    return Mc
-
-mMin = 6
-minPossibleMChirp = chirpmass(mMin,mMin)
-
 # Parse commandline arguments
 p = argparse.ArgumentParser()
 p.add_argument('--model')
@@ -30,7 +21,6 @@ p.add_argument('--nevents', type=int)
 p.add_argument('--nsteps', type=int)
 p.add_argument('--seed', type=int, default=0)
 p.add_argument('--posterior-key', default='bilby_posterior')
-p.add_argument('--lower-chirpmass-cut', type=int, default=minPossibleMChirp)
 args = p.parse_args()
 
 # Pass population and number of events via commandline
@@ -39,9 +29,6 @@ nevents = args.nevents
 
 # Bilby samples or mock gaussian samples
 posterior_key = args.posterior_key
-
-# Chirpmass cut on data?
-chirpmass_cut = args.lower_chirpmass_cut
 
 # Model
 model = args.model 
@@ -56,8 +43,6 @@ if posterior_key != 'bilby_posterior':
     model_savename += f"_{posterior_key}"
 if args.seed != 0:
     model_savename += f"_{seed}" 
-if chirpmass_cut > minPossibleMChirp: 
-    model_savename += f"_chirpmasscut{chirpmass_cut}" 
 
 # set seed for reproducibility
 seed = args.seed if args.seed!=0 else 2345 # arbitrary
@@ -76,70 +61,41 @@ pop_names = {
 }
 
 # Load sampleDict
-with open(froot+f"PopulationInferenceInput/sampleDict_{pop_names[pop]}_full_mass_range.json", 'r') as f: 
+with open(froot+f"PopulationInferenceInput/sampleDict_{pop_names[pop]}.json", 'r') as f: 
     sampleDict_full = json.load(f)
     
 ## Condition sampleDict: 
-    
-# 1. Impose chirpmass cut if necessary 
-if chirpmass_cut > minPossibleMChirp: 
-    sampleDict_temp1 = {}
-    for event in sampleDict_full.keys(): 
-        # fetch event's injected parameters and calculate the chirp mass
-        inj_m1 = sampleDict_full[event]['injected_params']['m1']
-        inj_m2 = sampleDict_full[event]['injected_params']['m2']
-        inj_mc = chirpmass(inj_m1, inj_m2)
-        # only keep events with injected chirpmass greater than the given cut
-        if inj_mc >= chirpmass_cut: 
-            sampleDict_temp1[event] = sampleDict_full[event]
+
+# 1. Choose subset of sampleDict if necessary
+if int(nevents)<len(sampleDict_full.keys()): 
+    keys = [key for key in sampleDict_full.keys()]
+    events = np.random.choice(keys, size=int(nevents), replace=False)
+    sampleDict_temp1 = {event:sampleDict_full[event] for event in events}
 else: 
     sampleDict_temp1 = sampleDict_full
     
-print(f'\nLoaded sampleDict had {len(sampleDict_full)} events; after chirpmass cut, {len(sampleDict_temp1)} remaining.')
-
-# 2. Choose subset of sampleDict if necessary
-if int(nevents)<len(sampleDict_temp1.keys()): 
-    keys = [key for key in sampleDict_temp1.keys()]
-    events = np.random.choice(keys, size=int(nevents), replace=False)
-    sampleDict_temp2 = {event:sampleDict_temp1[event] for event in events}
-else: 
-    sampleDict_temp2 = sampleDict_temp1
-    
-    if int(nevents)>len(sampleDict_temp2.keys()): 
+    if int(nevents)>len(sampleDict_temp1.keys()): 
         print('Too many events requested. Changing nevents to max # possible.')  
-        new_nevents = len(sampleDict_temp2.keys())
+        new_nevents = len(sampleDict_temp1.keys())
         model_savename = model_savename.replace(str(nevents), str(new_nevents))
         print('Savename updated: ', model_savename)
         nevents = new_nevents
 
-print(f'After nevents cut, {len(sampleDict_temp2)} remaining.')
+print(f'After nevents cut, {len(sampleDict_temp1)} remaining.')
     
-# 3. Choose the correct set of posterior samples from the sampleDict
+# 2. Choose the correct set of posterior samples from the sampleDict
 sampleDict = {}
-for event in sampleDict_temp2.keys():
+for event in sampleDict_temp1.keys():
     # for masses and redshifts always use bilby posteriors
-    d1 = {p:sampleDict_temp2[event][p] for p in ['m1', 'm2', 'z', 'dVc_dz']}
+    d1 = {p:sampleDict_temp1[event][p] for p in ['m1', 'm2', 'z', 'dVc_dz']}
     # for spin magnitude and tilts, option to use bilby or gaussian posteriors
-    d2 = {p:sampleDict_temp2[event][p][posterior_key] for p in ['a1', 'a2', 'cost1', 'cost2']}
+    d2 = {p:sampleDict_temp1[event][p][posterior_key] for p in ['a1', 'a2', 'cost1', 'cost2']}
     # combine into final sampleDict
     sampleDict[event] = {**d1, **d2}
     
 # Load injectionDict
-with open(froot+"PopulationInferenceInput/injectionDict_full_mass_range.json", 'r') as f: 
-    injectionDict_full = json.load(f)
-    
-# Chirpmass cut on injectionDict if necessary: 
-if chirpmass_cut > minPossibleMChirp:
-    injectionDict = {}
-    inj_mc = chirpmass(np.asarray(injectionDict_full['m1']), np.asarray(injectionDict_full['m2']))
-    mask = inj_mc >= chirpmass_cut
-    for param in injectionDict_full.keys(): 
-        array_with_cut = np.asarray(injectionDict_full[param])[mask]
-        injectionDict[param] = array_with_cut.tolist()
-else: 
-    injectionDict = injectionDict_full
-    
-print(f"Loaded injectionDict had {len(injectionDict_full['m1'])} events; after chirpmass cut, {len(injectionDict['m1'])} remaining.\n")
+with open(froot+"PopulationInferenceInput/injectionDict.json", 'r') as f: 
+    injectionDict = json.load(f)
     
 # Will save emcee chains temporarily in the .tmp folder in this directory
 output_folder_tmp = froot+"PopulationInferenceOutput/.tmp/"

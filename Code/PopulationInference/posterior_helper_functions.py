@@ -183,3 +183,9 @@ def calculate_betaDistribution(x, a, b):
     y = np.power(x, a-1)*np.power(1-x, b-1)/B
     
     return y
+
+
+def chirpmass(m1, m2): 
+    q = m2/m1
+    Mc = (q/(1.+q)**2)**(3./5.)*(m1+m2)
+    return Mc
