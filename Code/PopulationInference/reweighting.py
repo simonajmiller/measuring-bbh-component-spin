@@ -173,12 +173,16 @@ if __name__=="__main__":
     froot = '../../Data/'
     
     # Run settings we want to reweight
-    date = '080123'
+    date = '092823'
     models = ['betaPlusGaussian']
     pops = ['3']
-    nevents = ['70']
-    posterior_keys = ['bilby_posterior']
-    chirpmass_keys = ['chirpmasscut10', 'chirpmasscut15', 'chirpmasscut20', 'chirpmasscut25', 'chirpmasscut30']
+    nevents = ['70', '300']
+    posterior_keys = {
+        '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.2', 'gaussian_sigma_0.3', 
+                      'gaussian_sigma_0.4', 'gaussian_sigma_0.5', 'gaussian_sigma_1'], 
+        '300': ['bilby_posterior']
+
+    }
     
     print('\n') 
         
@@ -186,42 +190,41 @@ if __name__=="__main__":
     for model in models:
         for pop in pops: 
             for nevent in nevents:
-                for posterior_key in posterior_keys:
-                    for chirpmass_key in chirpmass_keys:
+                for posterior_key in posterior_keys[nevent]:
 
-                        print(f'{date}, {model}, pop {pop}, {nevent} events, {posterior_key} samples, {chirpmass_key}')
+                    print(f'{date}, {model}, pop {pop}, {nevent} events, {posterior_key} samples')
 
-                        # Cycle through runs we want to reweight
-                        if posterior_key != 'bilby_posterior':
-                            filename = f'PopulationInferenceOutput/{model}/{date}_{model}_pop{pop}_{nevent}events_{posterior_key}_{chirpmass_key}'
-                        else: 
-                            filename = f'PopulationInferenceOutput/{model}/{date}_{model}_pop{pop}_{nevent}events_{chirpmass_key}'
+                    # Cycle through runs we want to reweight
+                    if posterior_key != 'bilby_posterior':
+                        filename = f'{date}_{model}_pop{pop}_{nevent}events_{posterior_key}'
+                    else: 
+                        filename = f'{date}_{model}_pop{pop}_{nevent}events'
 
-                        # Load dict with individual event PE samples (Load sampleDict):
-                        pop_name = pop_names_dict[pop]
-                        with open(froot+f'PopulationInferenceInput/sampleDict_{pop_name}_full_mass_range.json') as f:
-                            sampleDict_full = json.load(f) 
+                    # Load dict with individual event PE samples (Load sampleDict):
+                    pop_name = pop_names_dict[pop]
+                    with open(froot+f'PopulationInferenceInput/sampleDict_{pop_name}.json') as f:
+                        sampleDict_full = json.load(f) 
 
-                        # Load population parameter PE samps
-                        with open(froot+filename+'.json', 'r') as f:
-                            hyperPEDict = json.load(f)
+                    # Load population parameter PE samps
+                    with open(froot+f'PopulationInferenceOutput/{model}/'+filename+'.json', 'r') as f:
+                        hyperPEDict = json.load(f)
 
-                        # Select only events from sampleDict used in this emcee run
-                        events = hyperPEDict['events_used']
-                        sampleDict = {}
-                        for event in events:
-                            # for masses and redshifts always use bilby posteriors
-                            d1 = {p:sampleDict_full[event][p] for p in ['m1', 'm2', 'z', 'dVc_dz']}
-                            # for spin magnitude and tilts, option to use bilby or gaussian posteriors
-                            d2 = {p:sampleDict_full[event][p][posterior_key] for p in ['a1', 'a2', 'cost1', 'cost2']}
-                            # combine into final sampleDict
-                            sampleDict[event] = {**d1, **d2}
+                    # Select only events from sampleDict used in this emcee run
+                    events = hyperPEDict['events_used']
+                    sampleDict = {}
+                    for event in events:
+                        # for masses and redshifts always use bilby posteriors
+                        d1 = {p:sampleDict_full[event][p] for p in ['m1', 'm2', 'z', 'dVc_dz']}
+                        # for spin magnitude and tilts, option to use bilby or gaussian posteriors
+                        d2 = {p:sampleDict_full[event][p][posterior_key] for p in ['a1', 'a2', 'cost1', 'cost2']}
+                        # combine into final sampleDict
+                        sampleDict[event] = {**d1, **d2}
 
-                        # Run reweighting 
-                        sampleDict_rw = pop_reweight(sampleDict, hyperPEDict, model)   
+                    # Run reweighting 
+                    sampleDict_rw = pop_reweight(sampleDict, hyperPEDict, model)   
 
-                        # Save results
-                        with open(froot+filename+'_reweighted_sampleDict.json', "w") as f:        
-                            json.dump(sampleDict_rw,f)
+                    # Save results
+                    with open(froot+'PopulationInferenceOutput/for_pp_plots/'+filename+'_reweighted_sampleDict.json', "w") as f:        
+                        json.dump(sampleDict_rw,f)
 
-                        print('\n') 
+                    print('\n') 
