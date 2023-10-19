@@ -8,7 +8,10 @@ import astropy.cosmology as cosmo
 import astropy.units as u
 from astropy.cosmology import Planck15
 
-from posterior_helper_functions import * 
+try:
+    from posterior_helper_functions import * 
+except: 
+    from .posterior_helper_functions import *
 
 """
 Function to do posterior reweighting 
@@ -174,15 +177,19 @@ if __name__=="__main__":
     
     # Run settings we want to reweight
     date = '092823'
-    models = ['betaPlusGaussian']
-    pops = ['3']
-    nevents = ['70', '300']
+#     models = ['betaPlusGaussian', 'betaPlusDoubleGaussian']
+#     pops = ['3']
+#     nevents = ['70', '300']
     posterior_keys = {
         '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.2', 'gaussian_sigma_0.3', 
                       'gaussian_sigma_0.4', 'gaussian_sigma_0.5', 'gaussian_sigma_1'], 
         '300': ['bilby_posterior']
 
     }
+
+    models = ['betaPlusDoubleGaussian']
+    pops = ['1', '2']
+    nevents = ['300']
     
     print('\n') 
         

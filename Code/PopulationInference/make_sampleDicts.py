@@ -41,13 +41,15 @@ for pop in pop_names:
     
     # Cycle through events
     for event in list_for_sampleDict: 
-        print(str(int(event))+'        ', end='\r')
                 
         job_name = "job_{0:05d}_result.json".format(int(event))
         fname = individual_inference_output_folder+f'{pop}/'+job_name
 
         # If the result exists, load in data + format correctly    
         if os.path.exists(fname):
+            
+            print(str(int(event))+'        ', end='\r')
+            
             with open(fname,'r') as jf:
                 result = json.load(jf)
 
@@ -65,19 +67,31 @@ for pop in pop_names:
             # Ignore those with injected masses that don't pass our cut 
             if injected_params['m1'] < mMin_cut or injected_params['m2'] < mMin_cut: 
                 continue
+                
+            # Cut out samples that don't mass the optimal SNR cut of 10 from our selection function
+            H1_opt_snr = np.asarray(result['posterior']['content']['H1_optimal_snr'])
+            L1_opt_snr = np.asarray(result['posterior']['content']['L1_optimal_snr'])
+            V1_opt_snr = np.asarray(result['posterior']['content']['V1_optimal_snr'])
+            optimal_snr = np.sqrt(H1_opt_snr**2 + L1_opt_snr**2 + V1_opt_snr**2)
+            mask = optimal_snr > 10
 
             # Fetch samples
-            m1 = np.asarray(result['posterior']['content']['mass_1_source'])
-            m2 = np.asarray(result['posterior']['content']['mass_2_source'])
-            z = np.asarray(result['posterior']['content']['redshift'])
-            chi1 = np.asarray(result['posterior']['content']['a_1'])
-            chi2 = np.asarray(result['posterior']['content']['a_2'])
-            cost1 =  np.asarray(result['posterior']['content']['cos_tilt_1'])
-            cost2 =  np.asarray(result['posterior']['content']['cos_tilt_2'])
+            m1 = np.asarray(result['posterior']['content']['mass_1_source'])[mask]
+            m2 = np.asarray(result['posterior']['content']['mass_2_source'])[mask]
+            z = np.asarray(result['posterior']['content']['redshift'])[mask]
+            chi1 = np.asarray(result['posterior']['content']['a_1'])[mask]
+            chi2 = np.asarray(result['posterior']['content']['a_2'])[mask]
+            cost1 =  np.asarray(result['posterior']['content']['cos_tilt_1'])[mask]
+            cost2 =  np.asarray(result['posterior']['content']['cos_tilt_2'])[mask]
 
             # Downsample to 5000 samples per event
             nsamps = min(len(m1),5000)
             idxs = np.random.choice(len(m1), size=nsamps)
+                
+            # If not enough samples pass the cut, ignore this event
+            if nsamps<100:
+                print(f'event {int(event)} has less than 100 samples with optimal snr > 10: {injected_params}') 
+                continue
 
             # Generate fake gaussian spin posteriors with a variety of sigmas
             gaussian_spins_dict = {}

@@ -18,12 +18,13 @@ f_root = '../../Data/PopulationInferenceOutput/'
 
 # For loading emcee samples
 date = '092823'
-model = 'betaPlusGaussian'
+model = 'betaPlusDoubleGaussian'
 pops = ['3']
 nevents = ['70', '300']
 posterior_keys = {
-    '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.2', 'gaussian_sigma_0.3', 
-                  'gaussian_sigma_0.4', 'gaussian_sigma_0.5', 'gaussian_sigma_1'], 
+    #'70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.2', 'gaussian_sigma_0.3', 
+                  #'gaussian_sigma_0.4', 'gaussian_sigma_0.5', 'gaussian_sigma_1'], 
+    '70': ['bilby_posterior'],
     '300': ['bilby_posterior']
     
 }
@@ -136,6 +137,8 @@ for pop_key in pop_keys:
 
             # Generate nCatalog instantiations of "catalogs"
             for run in np.arange(nCatalogs):
+                
+                print(run, end='\r')
 
                 '''
                 "Predicted" spins
@@ -146,22 +149,46 @@ for pop_key in pop_keys:
                 random_indices = np.random.choice(nhyperparams, size=nevents, replace=False)
 
                 for i,ind in enumerate(random_indices):
+                    
+                    if model=='betaPlusGaussian':
 
-                    # Fetch parameters 
-                    mu_chi = emcee_data['mu_chi']['processed'][ind]
-                    sigma_chi = emcee_data['sigma_chi']['processed'][ind]
-                    mu_cost = emcee_data['mu_cost']['processed'][ind]
-                    sigma_cost = emcee_data['sigma_cost']['processed'][ind]
-                    Bq = emcee_data['Bq']['processed'][ind]
+                        # Fetch parameters 
+                        mu_chi = emcee_data['mu_chi']['processed'][ind]
+                        sigma_chi = emcee_data['sigma_chi']['processed'][ind]
+                        mu_cost = emcee_data['mu_cost']['processed'][ind]
+                        sigma_cost = emcee_data['sigma_cost']['processed'][ind]
+                        Bq = emcee_data['Bq']['processed'][ind]
 
-                    # transform from mu and sigma to a and b for beta distribution
-                    a, b = mu_sigma2_to_a_b(mu_chi, sigma_chi**2)
+                        # transform from mu and sigma to a and b for beta distribution
+                        a, b = mu_sigma2_to_a_b(mu_chi, sigma_chi**2)
 
-                    # Calculate weights on values from injectionDict
-                    p_chi1 = calculate_betaDistribution(chi1s, a, b)
-                    p_chi2 = calculate_betaDistribution(chi2s, a, b)
-                    p_cost1 = calculate_Gaussian_1D(cost1s, mu_cost, sigma_cost, -1, 1)
-                    p_cost2 = calculate_Gaussian_1D(cost2s, mu_cost, sigma_cost, -1, 1)
+                        # Calculate weights on values from injectionDict
+                        p_chi1 = calculate_betaDistribution(chi1s, a, b)
+                        p_chi2 = calculate_betaDistribution(chi2s, a, b)
+                        p_cost1 = calculate_Gaussian_1D(cost1s, mu_cost, sigma_cost, -1, 1)
+                        p_cost2 = calculate_Gaussian_1D(cost2s, mu_cost, sigma_cost, -1, 1)
+                        
+                    elif model=='betaPlusDoubleGaussian': 
+                        
+                        # Fetch parameters 
+                        mu_chi = emcee_data['mu_chi']['processed'][ind]
+                        sigma_chi = emcee_data['sigma_chi']['processed'][ind]
+                        mu_cost1 = emcee_data['mu1_cost']['processed'][ind]
+                        sigma_cost1 = emcee_data['sigma1_cost']['processed'][ind]
+                        mu_cost2 = emcee_data['mu2_cost']['processed'][ind]
+                        sigma_cost2 = emcee_data['sigma2_cost']['processed'][ind]
+                        frac = emcee_data['MF_cost']['processed'][ind]
+                        Bq = emcee_data['Bq']['processed'][ind]
+
+                        # transform from mu and sigma to a and b for beta distribution
+                        a, b = mu_sigma2_to_a_b(mu_chi, sigma_chi**2)
+
+                        # Calculate weights on values from injectionDict
+                        p_chi1 = calculate_betaDistribution(chi1s, a, b)
+                        p_chi2 = calculate_betaDistribution(chi2s, a, b)
+                        p_cost1 = calculate_Double_Gaussian(cost1s, mu_cost1, sigma_cost1, mu_cost2, sigma_cost2, frac,  -1, 1)
+                        p_cost2 = calculate_Double_Gaussian(cost2s, mu_cost1, sigma_cost1, mu_cost2, sigma_cost2, frac,  -1, 1)
+                        
                     p_masses = p_astro_masses(m1s, m2s, bq=Bq, mCut=8)
                     p_z = p_astro_z(zs, dV_dz=dVdzs)
 
