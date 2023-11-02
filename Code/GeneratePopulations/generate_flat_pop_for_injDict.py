@@ -33,8 +33,8 @@ psd_H1 = read.from_txt('./aligo_O3actual_H1.txt',f_upper,delta_f,10,is_asd_file=
 psd_L1 = read.from_txt('./aligo_O3actual_L1.txt',f_upper,delta_f,10,is_asd_file=True)
 psd_V1 = read.from_txt('./avirgo_O3actual.txt',f_upper,delta_f,10,is_asd_file=True)
 
-# Want to generate 50000 draws from the population
-target = 50000 
+# Want to generate 200000 draws from the population
+target = 200000 
 
 # for mass distribution
 lambda_peak=0.033

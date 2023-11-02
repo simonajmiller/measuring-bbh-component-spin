@@ -176,20 +176,15 @@ if __name__=="__main__":
     froot = '../../Data/'
     
     # Run settings we want to reweight
-    date = '092823'
-#     models = ['betaPlusGaussian', 'betaPlusDoubleGaussian']
-#     pops = ['3']
-#     nevents = ['70', '300']
+    date = '101923'
+    models = ['betaPlusGaussian', 'betaPlusDoubleGaussian']
+    pops = ['1', '2', '3']
+    nevents = ['70', '300']
     posterior_keys = {
-        '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.2', 'gaussian_sigma_0.3', 
-                      'gaussian_sigma_0.4', 'gaussian_sigma_0.5', 'gaussian_sigma_1'], 
-        '300': ['bilby_posterior']
+        '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5'], 
+        '300': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5']
 
     }
-
-    models = ['betaPlusDoubleGaussian']
-    pops = ['1', '2']
-    nevents = ['300']
     
     print('\n') 
         

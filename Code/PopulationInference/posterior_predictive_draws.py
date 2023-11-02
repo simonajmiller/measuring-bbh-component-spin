@@ -17,15 +17,14 @@ Load data
 f_root = '../../Data/PopulationInferenceOutput/'
 
 # For loading emcee samples
-date = '092823'
-model = 'betaPlusDoubleGaussian'
-pops = ['3']
+date = '101923'
+#model = 'betaPlusDoubleGaussian'
+model = 'betaPlusGaussian'
+pops = ['1', '2', '3']
 nevents = ['70', '300']
 posterior_keys = {
-    #'70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.2', 'gaussian_sigma_0.3', 
-                  #'gaussian_sigma_0.4', 'gaussian_sigma_0.5', 'gaussian_sigma_1'], 
-    '70': ['bilby_posterior'],
-    '300': ['bilby_posterior']
+    '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5'], 
+    '300': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5'], 
     
 }
 

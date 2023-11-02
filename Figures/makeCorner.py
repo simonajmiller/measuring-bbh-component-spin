@@ -102,7 +102,7 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
                     histtype='step',color='black',density=True,zorder=2)
             
         if 'true_val' in plot_data[key].keys(): 
-            ax.axvline(plot_data[key]['true_val'], ls='--', color='crimson')
+            ax.axvline(plot_data[key]['true_val'], ls='--', color='k')
 
         ax.grid(True,dashes=(1,3))
         ax.set_xlim(plot_data[key]['plot_bounds'][0],plot_data[key]['plot_bounds'][1])
@@ -142,9 +142,9 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
                              linewidths=(0,),zorder=0,vmax=vmax)
                     
                 if 'true_val' in plot_data[key].keys(): 
-                    ax.axvline(plot_data[key]['true_val'], ls='--', color='crimson')
+                    ax.axvline(plot_data[key]['true_val'], ls='--', color='k')
                 if 'true_val' in plot_data[k].keys(): 
-                    ax.axhline(plot_data[k]['true_val'], ls='--', color='crimson')
+                    ax.axhline(plot_data[k]['true_val'], ls='--', color='k')
                 
                 # Set plot bounds
                 ax.set_xlim(plot_data[key]['plot_bounds'][0],plot_data[key]['plot_bounds'][1])
