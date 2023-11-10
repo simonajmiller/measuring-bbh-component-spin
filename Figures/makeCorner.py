@@ -112,8 +112,7 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
             ax.set_title(r"${0:.2f}^{{+{1:.2f}}}_{{-{2:.2f}}}$".format(*getBounds(posterior)),fontsize=14)
 
         # Turn off tick labels if this isn't the first dimension
-        if i!=0:
-            ax.set_yticklabels([])
+        ax.set_yticklabels([])
 
         # If this is the last dimension add an x-axis label
         if i==ndim-1:
@@ -129,17 +128,25 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
                 ax = fig.add_subplot(ndim,ndim,int(1+(ndim+1)*i + (j+1)*ndim))
                 
                 for pop in plot_data[key]['data']: 
-            
-                    posterior1 = plot_data[key]['data'][pop]['posterior']
-                    posterior2 = plot_data[k]['data'][pop]['posterior']
-                    color = plot_data[key]['data'][pop]['color']
-                
-                    # Define a linear color map(s)
-                    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", [(1,1,1,0.2),color])
+                    
+                    if pop in plot_data[k]['data'].keys():
+                        posterior1 = plot_data[key]['data'][pop]['posterior']
+                        posterior2 = plot_data[k]['data'][pop]['posterior']
+                        color = plot_data[key]['data'][pop]['color']
 
-                    ax.hexbin(posterior1,posterior2,cmap=cmap,mincnt=1,gridsize=bins,bins=hexscale,\
-                             rasterized=True,extent=(plot_data[key]['plot_bounds'][0],plot_data[key]['plot_bounds'][1],plot_data[k]['plot_bounds'][0],plot_data[k]['plot_bounds'][1]),
-                             linewidths=(0,),zorder=0,vmax=vmax)
+                        # Define a linear color map(s)
+                        cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", [(1,1,1,0.2),color])
+
+                        ax.hexbin(
+                            posterior1,posterior2,
+                            cmap=cmap,mincnt=1,gridsize=bins,bins=hexscale,
+                            rasterized=True,
+                            linewidths=(0,),zorder=0,vmax=vmax,
+                            extent=(plot_data[key]['plot_bounds'][0],
+                                    plot_data[key]['plot_bounds'][1],
+                                    plot_data[k]['plot_bounds'][0],
+                                    plot_data[k]['plot_bounds'][1]),
+                        )
                     
                 if 'true_val' in plot_data[key].keys(): 
                     ax.axvline(plot_data[key]['true_val'], ls='--', color='k')
