@@ -5,9 +5,9 @@ import sys
 sys.path.append('/home/simona.miller/measuring-bbh-component-spin/Code/PopulationInference')
 from posterior_helper_functions import *
 
-def reflected_kde_1d(x, A, B, npoints=1000): 
+def reflected_kde_1d(x, A, B, npoints=1000, **kws): 
     grid = np.linspace(A,B,npoints)
-    kde_on_grid = gaussian_kde(x)(grid) + gaussian_kde(2*A-x)(grid) + gaussian_kde(2*B-x)(grid)
+    kde_on_grid = gaussian_kde(x, **kws)(grid) + gaussian_kde(2*A-x, **kws)(grid) + gaussian_kde(2*B-x, **kws)(grid)
     return grid, kde_on_grid
 
 def calculate_chiEff(chi1, chi2, cost1, cost2, q): 

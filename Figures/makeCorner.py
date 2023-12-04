@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import style
 import os
 style.use(os.path.dirname(os.path.realpath(__file__))+'/plotting.mplstyle')
+import seaborn as sns
 
 def getBounds(data):
 
@@ -40,7 +41,7 @@ def getBounds(data):
     
     return med,upperError,lowerError
     
-def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False,vmax=None):
+def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False,vmax=None,plot_titles=True):
 
     """
     Helper function to generate corner plots of posterior samples.
@@ -85,12 +86,14 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
     # Loop across dimensions that we want to plot
     keys = list(plot_data)    
     ndim = len(keys)
+    
     for i,key in enumerate(keys):
        
         # Plot the marginal 1D posterior(s) (i.e. top of a corner plot column)
         ax = fig.add_subplot(ndim,ndim,int(1+(ndim+1)*i))
         
-        for pop in plot_data[key]['data']: 
+        npops = len(plot_data[key]['data'])
+        for n, pop in enumerate(plot_data[key]['data']): 
                         
             posterior = plot_data[key]['data'][pop]['posterior']
             color = plot_data[key]['data'][pop]['color']
@@ -101,15 +104,18 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
             ax.hist(posterior,bins=np.linspace(plot_data[key]['plot_bounds'][0],plot_data[key]['plot_bounds'][1],bins),\
                     histtype='step',color='black',density=True,zorder=2)
             
+             # Plot the error bar values
+            if plot_titles:
+                ebar_str = r"${0:.2f}^{{+{1:.2f}}}_{{-{2:.2f}}}$".format(*getBounds(posterior))
+                ymax = 0.85 + npops*0.26
+                ax.text(0.5, ymax - 0.26*n, ebar_str, fontsize=14, transform=ax.transAxes,
+                             horizontalalignment='center', verticalalignment='bottom', color=color)
+            
         if 'true_val' in plot_data[key].keys(): 
             ax.axvline(plot_data[key]['true_val'], ls='--', color='k')
 
         ax.grid(True,dashes=(1,3))
         ax.set_xlim(plot_data[key]['plot_bounds'][0],plot_data[key]['plot_bounds'][1])
-        
-        # If just plotting one data set, plot the error bar values
-        if len(plot_data[key]['data'].keys()) == 1:
-            ax.set_title(r"${0:.2f}^{{+{1:.2f}}}_{{-{2:.2f}}}$".format(*getBounds(posterior)),fontsize=14)
 
         # Turn off tick labels if this isn't the first dimension
         ax.set_yticklabels([])
@@ -136,7 +142,8 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
 
                         # Define a linear color map(s)
                         cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", [(1,1,1,0.2),color])
-
+                        
+                        # Plot 2d hist
                         ax.hexbin(
                             posterior1,posterior2,
                             cmap=cmap,mincnt=1,gridsize=bins,bins=hexscale,
@@ -147,6 +154,13 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
                                     plot_data[k]['plot_bounds'][0],
                                     plot_data[k]['plot_bounds'][1]),
                         )
+                        
+                        # Plot contours
+                        sns.kdeplot(x=posterior1, y=posterior2, 
+                                    ax=ax, color=color, 
+                                    levels=[0.5, 0.95],
+                                    fill=False,
+                                    zorder=2)
                     
                 if 'true_val' in plot_data[key].keys(): 
                     ax.axvline(plot_data[key]['true_val'], ls='--', color='k')
@@ -170,5 +184,13 @@ def plot_corner(fig,plot_data,hist_alpha=0.7,bins=20,labelsize=14,logscale=False
                 else:
                     ax.set_xticklabels([])
                     
-    plt.tight_layout()    
     return fig
+
+
+def add_mu_sigma_prior(ax): 
+    # Add constraint on mu_chi sigma_chi from prior 
+    mu_range = np.linspace(0,1,100)
+    constraint1 = np.sqrt((mu_range**2.)*(1-mu_range)/(1+mu_range))
+    constraint2 = np.sqrt(mu_range*((1-mu_range)**2.)/(2-mu_range))
+    total_constraint = np.minimum(constraint1, constraint2)
+    ax.fill_between(mu_range, total_constraint, y2=np.zeros(100)+0.5, alpha=0.1, color='k')
