@@ -1,4 +1,5 @@
 import numpy as np
+import scipy
 from scipy.stats import gaussian_kde
 import math
 import sys 
@@ -264,3 +265,37 @@ def get_fraction_underpredicted(d, params=['chi1', 'cost1', 'chieff', 'chip'], n
         percentages_dict[param_key] = {'percentages':means, 'error':stds, 'x_vals':np.asarray(midpoints)}
         
     return slopes_dict, percentages_dict
+
+
+
+def plot_pp_error_bars(ax, N, number_x_values=1001, fill=False):
+    """
+    param: N , int, number of independent draw from prior runs 
+    """
+    
+    confidence_interval = [0.68, 0.95, 0.997]
+    x_values = np.linspace(0, 1, number_x_values)
+    confidence_interval_alpha = 0.1
+    if isinstance(confidence_interval_alpha, float):
+        confidence_interval_alpha = [confidence_interval_alpha] * len(confidence_interval)
+
+    # stolen from https://git.ligo.org/lscsoft/bilby/-/blob/master/bilby/core/result.py#L2102
+    # make_pp_plot
+    for ci, alpha in zip(confidence_interval, confidence_interval_alpha):
+        edge_of_bound = (1. - ci) / 2.
+        
+        # each bin ((1-ci)/2, (1+ci)/2) describes probability of falling in that bound 
+        lower = scipy.stats.binom.ppf(1 - edge_of_bound, N, x_values) / N
+        upper = scipy.stats.binom.ppf(edge_of_bound, N, x_values) / N
+        
+        # The binomial point percent function doesn't always return 0 at 0,
+        # so set those bounds explicitly to be sure
+        lower[0] = 0
+        upper[0] = 0
+        
+        if fill:
+            ax.fill_between(x_values, lower, upper, alpha=alpha, color='k')
+        
+        kws = dict(alpha=0.4, color='k', lw=1, zorder=1)
+        ax.plot(x_values, lower, **kws)
+        ax.plot(x_values, upper, **kws)
