@@ -80,7 +80,7 @@ def pop_reweight(sampleDict, hyperPEDict, model):
                 p_cost1 = calculate_Gaussian_1D(cost1_samples, mu_cost, sigma_cost, -1, 1)
                 p_cost2 = calculate_Gaussian_1D(cost2_samples, mu_cost, sigma_cost, -1, 1)
                 
-            elif model == 'betaPlusDoubleGaussian':
+            elif model == 'betaPlusDoubleGaussian' or model=='betaPlusDoubleGaussian2':
                 
                 # Fetch i^th hyper PE sample: 
                 mu_chi = hyperPEDict['mu_chi']['processed'][i]
@@ -176,15 +176,25 @@ if __name__=="__main__":
     froot = '../../Data/'
     
     # Run settings we want to reweight
-    date = '101923'
-    models = ['betaPlusGaussian', 'betaPlusDoubleGaussian']
-    pops = ['1', '2', '3']
+#     date = '101923'
+#     models = ['betaPlusGaussian', 'betaPlusDoubleGaussian']
+#     pops = ['1', '2', '3']
+#     nevents = ['70', '300']
+#     posterior_keys = {
+#         '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5'], 
+#         '300': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5']
+
+#     }
+
+    date = '110623'
+    models = ['betaPlusDoubleGaussian2']
+    pops = ['3']
     nevents = ['70', '300']
     posterior_keys = {
-        '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5'], 
-        '300': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5']
-
+        '70': ['bilby_posterior'],
+        '300': ['bilby_posterior'],
     }
+
     
     print('\n') 
         

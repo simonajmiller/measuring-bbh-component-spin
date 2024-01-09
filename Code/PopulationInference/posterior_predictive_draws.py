@@ -17,15 +17,24 @@ Load data
 f_root = '../../Data/PopulationInferenceOutput/'
 
 # For loading emcee samples
-date = '101923'
-#model = 'betaPlusDoubleGaussian'
-model = 'betaPlusGaussian'
-pops = ['1', '2', '3']
+# date = '101923'
+# #model = 'betaPlusDoubleGaussian'
+# model = 'betaPlusGaussian'
+# pops = ['1', '2', '3']
+# nevents = ['70', '300']
+# posterior_keys = {
+#     '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5'], 
+#     '300': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5'], 
+    
+# }
+
+date = '110623'
+model = 'betaPlusDoubleGaussian2'
+pops = ['3']
 nevents = ['70', '300']
 posterior_keys = {
-    '70': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5'], 
-    '300': ['bilby_posterior', 'gaussian_sigma_0.1', 'gaussian_sigma_0.3', 'gaussian_sigma_0.5'], 
-    
+    '70': ['bilby_posterior'],
+    '300': ['bilby_posterior'],
 }
 
 # Make dicts
@@ -167,7 +176,7 @@ for pop_key in pop_keys:
                         p_cost1 = calculate_Gaussian_1D(cost1s, mu_cost, sigma_cost, -1, 1)
                         p_cost2 = calculate_Gaussian_1D(cost2s, mu_cost, sigma_cost, -1, 1)
                         
-                    elif model=='betaPlusDoubleGaussian': 
+                    elif model=='betaPlusDoubleGaussian' or model=='betaPlusDoubleGaussian2': 
                         
                         # Fetch parameters 
                         mu_chi = emcee_data['mu_chi']['processed'][ind]
