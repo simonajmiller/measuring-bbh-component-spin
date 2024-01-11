@@ -82,21 +82,35 @@ def draw_chiEffs_and_chiPs_betaDoubleGauss(mu_chi, sigma_chi, mu1_cost, sigma1_c
     p_cost2 = calculate_Double_Gaussian(cost2s, mu1_cost, sigma1_cost, mu2_cost, sigma2_cost, MF_cost, -1, 1)
     p_masses = p_astro_masses(m1s, m2s, mCut=mCut, bq=Bq)
     
-    weights = p_chi1*p_chi2*p_cost1*p_cost2*p_masses
-    weights_normed = weights/np.sum(weights)
-    weights_normed[np.where(weights_normed<0)] = 0 # get rid of tiny division errors
+#     weights = p_chi1*p_chi2*p_cost1*p_cost2*p_masses
+#     weights_normed = weights/np.sum(weights)
+#     weights_normed[np.where(weights_normed<0)] = 0 # get rid of tiny division errors
     
-    # select a subset of the samples subject to the weights calculated from p(spins,masses)
-    idxs = np.random.choice(samp_idxs, p=weights_normed, size=n)  
+#     # select a subset of the samples subject to the weights calculated from p(spins,masses)
+#     idxs = np.random.choice(samp_idxs, p=weights_normed, size=n)  
+    
+#     # calculate chi-eff for these samples
+#     q = m2s[idxs]/m1s[idxs]
+#     chi_eff = calculate_chiEff(chi1s[idxs], chi2s[idxs], cost1s[idxs], cost2s[idxs], q)
+    
+#     # and chi-p
+#     sint1s = np.sin(np.arccos(cost1s))
+#     sint2s = np.sin(np.arccos(cost2s))
+#     chip = calculate_chiP(chi1s[idxs], chi2s[idxs], sint1s[idxs], sint2s[idxs], q)
+
+    chi1s = np.random.choice(chi1s, p=p_chi1/np.sum(p_chi1), size=n, replace=False)
+    chi2s = np.random.choice(chi2s, p=p_chi2/np.sum(p_chi2), size=n, replace=False)
+    cost1s = np.random.choice(cost1s, p=p_cost1/np.sum(p_cost1), size=n, replace=False)
+    cost2s = np.random.choice(cost2s, p=p_cost2/np.sum(p_cost2), size=n, replace=False)
+    qs = np.random.choice(m2s/m1s, p=p_masses/np.sum(p_masses), size=n, replace=False)
     
     # calculate chi-eff for these samples
-    q = m2s[idxs]/m1s[idxs]
-    chi_eff = calculate_chiEff(chi1s[idxs], chi2s[idxs], cost1s[idxs], cost2s[idxs], q)
+    chi_eff = calculate_chiEff(chi1s, chi2s, cost1s, cost2s, qs)
     
     # and chi-p
     sint1s = np.sin(np.arccos(cost1s))
     sint2s = np.sin(np.arccos(cost2s))
-    chip = calculate_chiP(chi1s[idxs], chi2s[idxs], sint1s[idxs], sint2s[idxs], q)
+    chip = calculate_chiP(chi1s, chi2s, sint1s, sint2s, qs)
         
     return chi_eff, chip
 
@@ -126,21 +140,74 @@ def draw_chiEffs_and_chiPs_betaGauss(mu_chi, sigma_chi, mu_cost, sigma_cost, Bq,
     p_cost2 = calculate_Gaussian_1D(cost2s, mu_cost, sigma_cost, -1, 1)     
     p_masses = p_astro_masses(m1s, m2s, mCut=mCut, bq=Bq)
     
-    weights = p_chi1*p_chi2*p_cost1*p_cost2*p_masses
-    weights_normed = weights/np.sum(weights)
-    weights_normed[np.where(weights_normed<0)] = 0 # get rid of tiny division errors
+#     weights = p_chi1*p_chi2*p_cost1*p_cost2*p_masses
+#     weights_normed = weights/np.sum(weights)
+#     weights_normed[np.where(weights_normed<0)] = 0 # get rid of tiny division errors
     
-    # select a subset of the samples subject to the weights calculated from p(spins,masses)
-    idxs = np.random.choice(samp_idxs, p=weights_normed, size=n)  
+#     # select a subset of the samples subject to the weights calculated from p(spins,masses)
+#     idxs = np.random.choice(samp_idxs, p=weights_normed, size=n)  
+    
+#     # calculate chi-eff for these samples
+#     q = m2s[idxs]/m1s[idxs]
+#     chi_eff = calculate_chiEff(chi1s[idxs], chi2s[idxs], cost1s[idxs], cost2s[idxs], q)
+    
+#     # and chi-p
+#     sint1s = np.sin(np.arccos(cost1s))
+#     sint2s = np.sin(np.arccos(cost2s))
+#     chip = calculate_chiP(chi1s[idxs], chi2s[idxs], sint1s[idxs], sint2s[idxs], q)
+
+
+    chi1s = np.random.choice(chi1s, p=p_chi1/np.sum(p_chi1), size=n, replace=False)
+    chi2s = np.random.choice(chi2s, p=p_chi2/np.sum(p_chi2), size=n, replace=False)
+    cost1s = np.random.choice(cost1s, p=p_cost1/np.sum(p_cost1), size=n, replace=False)
+    cost2s = np.random.choice(cost2s, p=p_cost2/np.sum(p_cost2), size=n, replace=False)
+    qs = np.random.choice(m2s/m1s, p=p_masses/np.sum(p_masses), size=n, replace=False)
     
     # calculate chi-eff for these samples
-    q = m2s[idxs]/m1s[idxs]
-    chi_eff = calculate_chiEff(chi1s[idxs], chi2s[idxs], cost1s[idxs], cost2s[idxs], q)
+    chi_eff = calculate_chiEff(chi1s, chi2s, cost1s, cost2s, qs)
     
     # and chi-p
     sint1s = np.sin(np.arccos(cost1s))
     sint2s = np.sin(np.arccos(cost2s))
-    chip = calculate_chiP(chi1s[idxs], chi2s[idxs], sint1s[idxs], sint2s[idxs], q)
+    chip = calculate_chiP(chi1s, chi2s, sint1s, sint2s, qs)
+        
+    return chi_eff, chip
+
+
+def draw_chiEffs_and_chiPs_gaussDoubleGauss(mu_chi, sigma_chi, mu1_cost, sigma1_cost, mu2_cost, sigma2_cost, MF_cost, Bq,  mCut=None, n=1):
+    
+    # draw uniform component spins + masses
+    nRandomDraws = 10000
+    samp_idxs = np.arange(nRandomDraws)
+    chi1s = np.random.rand(nRandomDraws)
+    chi2s = np.random.rand(nRandomDraws)
+    cost1s = np.random.rand(nRandomDraws)*2 - 1
+    cost2s = np.random.rand(nRandomDraws)*2 - 1
+    mAs = np.random.rand(nRandomDraws)*100
+    mBs = np.random.rand(nRandomDraws)*100
+    m1s = np.maximum(mAs, mBs)
+    m2s = np.minimum(mAs, mBs)
+    
+    # calculate p(spins,masses) for these uniform samples, using functions from posterior_helper_functions.py
+    p_chi1 = calculate_Gaussian_1D(chi1s, mu_chi, sigma_chi, 0, 1)
+    p_chi2 = calculate_Gaussian_1D(chi2s, mu_chi, sigma_chi, 0, 1)
+    p_cost1 = calculate_Double_Gaussian(cost1s, mu1_cost, sigma1_cost, mu2_cost, sigma2_cost, MF_cost, -1, 1)
+    p_cost2 = calculate_Double_Gaussian(cost2s, mu1_cost, sigma1_cost, mu2_cost, sigma2_cost, MF_cost, -1, 1)
+    p_masses = p_astro_masses(m1s, m2s, mCut=mCut, bq=Bq)
+    
+    chi1s = np.random.choice(chi1s, p=p_chi1/np.sum(p_chi1), size=n, replace=False)
+    chi2s = np.random.choice(chi2s, p=p_chi2/np.sum(p_chi2), size=n, replace=False)
+    cost1s = np.random.choice(cost1s, p=p_cost1/np.sum(p_cost1), size=n, replace=False)
+    cost2s = np.random.choice(cost2s, p=p_cost2/np.sum(p_cost2), size=n, replace=False)
+    qs = np.random.choice(m2s/m1s, p=p_masses/np.sum(p_masses), size=n, replace=False)
+    
+    # calculate chi-eff for these samples
+    chi_eff = calculate_chiEff(chi1s, chi2s, cost1s, cost2s, qs)
+    
+    # and chi-p
+    sint1s = np.sin(np.arccos(cost1s))
+    sint2s = np.sin(np.arccos(cost2s))
+    chip = calculate_chiP(chi1s, chi2s, sint1s, sint2s, qs)
         
     return chi_eff, chip
 
