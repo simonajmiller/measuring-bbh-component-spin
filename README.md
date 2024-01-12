@@ -1,6 +1,6 @@
 # `measuring-bbh-component-spin`: Repository for *Gravitational waves carry information beyond effective spin parameters but it is hard to extract* (Miller et. al. 2024)
 
-This repository contains all the code to reproduce the results in *Gravitational wave signals carry information beyond effective spin parameters* [insert arxiv link]. None of the specific data used is pushed to the repo because the files are large but we give step by step instructions on how to recreate all data used below. The repo is set up with all the requisite folders / organization. Folders that our scripts write data to currently just contain `.gitkeep` files as placeholders. 
+This repository contains all the code to reproduce the results in [*Gravitational wave signals carry information beyond effective spin parameters but it is hard to extract*](https://arxiv.org/abs/2401.05613). None of the specific data used is pushed to the repo because the files are large but we give step by step instructions on how to recreate all data used below. The repo is set up with all the requisite folders / organization. Folders that our scripts write data to currently just contain `.gitkeep` files as placeholders. 
 
 We here describe how to produce the results in the main text of the paper. For questions about generating results in the appendices please email smiller@caltech.edu. 
 
