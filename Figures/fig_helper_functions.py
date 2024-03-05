@@ -21,6 +21,20 @@ def calculate_chiP(chi1, chi2, sint1, sint2, q):
     chip = np.maximum(term1,term2)
     return chip 
 
+def calculate_generalizedChiP(chi1, chi2, sint1, sint2, phi12, q):
+    # Eq.(15) of https://arxiv.org/abs/2011.11948
+
+    omega_tilda = q * (4 * q + 3) / (4 + 3 * q)
+
+    term1 = chi1 * sint1
+    term2 = omega_tilda * chi2 * sint2
+    term3 = 2 * omega_tilda * chi1 * chi2 * sint1 * sint2 * np.cos(phi12)
+    
+    arg = term1 ** 2 + term2 ** 2 + term3
+    gen_chip = np.sqrt(arg)
+
+    return gen_chip
+
 
 def get_KDE_dict_spins(pop, npoints=500): 
     
@@ -47,18 +61,30 @@ def get_KDE_dict_spins(pop, npoints=500):
     chip = calculate_chiP(chi1, chi2, sint1, sint2, q)
     chip_kde = reflected_kde_1d(chip, 0, 1, npoints=npoints)[1]
     
+    # gen chi p 
+    s1perp_dot_s2perp = pop.s1x*pop.s2x + pop.s1y*pop.s2y
+    mag_s1_perp = np.sqrt(pop.s1x**2 + pop.s1y**2)
+    mag_s2_perp = np.sqrt(pop.s2x**2 + pop.s2y**2)
+    phi12 = np.arccos(s1perp_dot_s2perp / (mag_s1_perp * mag_s2_perp))
+    gen_chip = calculate_generalizedChiP(chi1, chi2, sint1, sint2, phi12, q)
+    gen_chip_to_kde = gen_chip[~np.isnan(gen_chip)]
+    gen_chip_kde = reflected_kde_1d(gen_chip_to_kde, 0, 2, npoints=npoints)[1]
+    
     # put KDEs into dict
     kde_dict = {
         'chi':chi_kde, 
         'cost':cost_kde, 
         'chieff':chieff_kde, 
-        'chip':chip_kde
+        'chip':chip_kde, 
+        'gen_chip':gen_chip_kde
     }
     
     return kde_dict 
 
 
-def draw_chiEffs_and_chiPs_betaDoubleGauss(mu_chi, sigma_chi, mu1_cost, sigma1_cost, mu2_cost, sigma2_cost, MF_cost, Bq,  mCut=None, n=1):
+def draw_chiEffs_and_chiPs_betaDoubleGauss(
+    mu_chi, sigma_chi, mu1_cost, sigma1_cost, mu2_cost, sigma2_cost, MF_cost, Bq,  mCut=None, n=1, calc_gen_chip=False
+):
     
     # transform from mu and sigma to a and b for beta distribution
     a, b = mu_sigma2_to_a_b(mu_chi, sigma_chi**2)
@@ -81,22 +107,6 @@ def draw_chiEffs_and_chiPs_betaDoubleGauss(mu_chi, sigma_chi, mu1_cost, sigma1_c
     p_cost1 = calculate_Double_Gaussian(cost1s, mu1_cost, sigma1_cost, mu2_cost, sigma2_cost, MF_cost, -1, 1)
     p_cost2 = calculate_Double_Gaussian(cost2s, mu1_cost, sigma1_cost, mu2_cost, sigma2_cost, MF_cost, -1, 1)
     p_masses = p_astro_masses(m1s, m2s, mCut=mCut, bq=Bq)
-    
-#     weights = p_chi1*p_chi2*p_cost1*p_cost2*p_masses
-#     weights_normed = weights/np.sum(weights)
-#     weights_normed[np.where(weights_normed<0)] = 0 # get rid of tiny division errors
-    
-#     # select a subset of the samples subject to the weights calculated from p(spins,masses)
-#     idxs = np.random.choice(samp_idxs, p=weights_normed, size=n)  
-    
-#     # calculate chi-eff for these samples
-#     q = m2s[idxs]/m1s[idxs]
-#     chi_eff = calculate_chiEff(chi1s[idxs], chi2s[idxs], cost1s[idxs], cost2s[idxs], q)
-    
-#     # and chi-p
-#     sint1s = np.sin(np.arccos(cost1s))
-#     sint2s = np.sin(np.arccos(cost2s))
-#     chip = calculate_chiP(chi1s[idxs], chi2s[idxs], sint1s[idxs], sint2s[idxs], q)
 
     chi1s = np.random.choice(chi1s, p=p_chi1/np.sum(p_chi1), size=n, replace=False)
     chi2s = np.random.choice(chi2s, p=p_chi2/np.sum(p_chi2), size=n, replace=False)
@@ -111,8 +121,16 @@ def draw_chiEffs_and_chiPs_betaDoubleGauss(mu_chi, sigma_chi, mu1_cost, sigma1_c
     sint1s = np.sin(np.arccos(cost1s))
     sint2s = np.sin(np.arccos(cost2s))
     chip = calculate_chiP(chi1s, chi2s, sint1s, sint2s, qs)
+    
+    # and generalized chip
+    if calc_gen_chip: 
+        phi12s = np.random.rand(n) * 2 * np.pi # population of phi12 is uniform between 0 and 2pi
+        gen_chip = calculate_generalizedChiP(chi1s, chi2s, sint1s, sint2s, phi12s, qs)
         
-    return chi_eff, chip
+        return chi_eff, chip, gen_chip
+    
+    else:    
+        return chi_eff, chip
 
 
 
@@ -139,23 +157,6 @@ def draw_chiEffs_and_chiPs_betaGauss(mu_chi, sigma_chi, mu_cost, sigma_cost, Bq,
     p_cost1 = calculate_Gaussian_1D(cost1s, mu_cost, sigma_cost, -1, 1)     
     p_cost2 = calculate_Gaussian_1D(cost2s, mu_cost, sigma_cost, -1, 1)     
     p_masses = p_astro_masses(m1s, m2s, mCut=mCut, bq=Bq)
-    
-#     weights = p_chi1*p_chi2*p_cost1*p_cost2*p_masses
-#     weights_normed = weights/np.sum(weights)
-#     weights_normed[np.where(weights_normed<0)] = 0 # get rid of tiny division errors
-    
-#     # select a subset of the samples subject to the weights calculated from p(spins,masses)
-#     idxs = np.random.choice(samp_idxs, p=weights_normed, size=n)  
-    
-#     # calculate chi-eff for these samples
-#     q = m2s[idxs]/m1s[idxs]
-#     chi_eff = calculate_chiEff(chi1s[idxs], chi2s[idxs], cost1s[idxs], cost2s[idxs], q)
-    
-#     # and chi-p
-#     sint1s = np.sin(np.arccos(cost1s))
-#     sint2s = np.sin(np.arccos(cost2s))
-#     chip = calculate_chiP(chi1s[idxs], chi2s[idxs], sint1s[idxs], sint2s[idxs], q)
-
 
     chi1s = np.random.choice(chi1s, p=p_chi1/np.sum(p_chi1), size=n, replace=False)
     chi2s = np.random.choice(chi2s, p=p_chi2/np.sum(p_chi2), size=n, replace=False)
